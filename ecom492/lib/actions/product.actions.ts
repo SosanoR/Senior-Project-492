@@ -1,5 +1,5 @@
 "use server";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { MONGODB_URI } from "../constants";
 import { item_data, ProductCardProps } from "@/_common/types";
 
@@ -20,7 +20,7 @@ export async function getLatest(limit: number) {
         {
           sort: { units_sold: -1 },
           projection: {
-            _id: 0,
+            _id: 1,
             item_name: 1,
             item_image: 1,
             average_rating: 1,
@@ -33,6 +33,22 @@ export async function getLatest(limit: number) {
       .toArray();
 
     return data;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    await client.close();
+  }
+}
+
+export async function findProduct(id: string) {
+  try {
+    await client.connect();
+    
+    const collection = client.db("testDB").collection<item_data>("items");
+    const product = await collection.findOne<item_data>(new ObjectId(id));
+
+    return product;
+
   } catch (error) {
     console.log(error);
   } finally {

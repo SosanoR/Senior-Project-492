@@ -1,3 +1,6 @@
+import {z} from "zod"
+
+
 export type item_data = {
   item_name: string;
   item_description: string;
@@ -20,6 +23,7 @@ export type item_data = {
 };
 
 export interface ProductCardProps {
+  _id: string;
   item_name: string;
   item_image: string;
   average_rating: number;

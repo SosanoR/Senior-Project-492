@@ -15,6 +15,7 @@ const ProductList = ({ products, title }: ProductListProps) => {
           {products.map((product: ProductCardProps, key: React.Key) => (
             <ProductCard
               key={key}
+              _id={product._id}
               item_image={product.item_image}
               item_name={product.item_name}
               item_price={product.item_price}

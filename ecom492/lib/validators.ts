@@ -1,0 +1,25 @@
+import { z } from "zod";
+import { formatNumberWithPrecision } from "./utils";
+
+const currency = z
+  .string()
+  .refine(
+    (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithPrecision(Number(value))),
+    "Price must have exactly two decimal places."
+  );
+
+//Schema for inserting Products
+export const insertSchema = z.object({
+  item_name: z.string().min(3, "Name must be at least 3 characters."),
+  item_description: z.string(),
+  item_category: z
+    .string()
+    .min(1, "Item must belong to at least one category."),
+  dimension_unit: z.string().min(1, "Item must have a unit of measurement."),
+  length: z.coerce.number(),
+  width: z.coerce.number(),
+  height: z.coerce.number(),
+  item_quantity: z.coerce.number(),
+  item_price: currency,
+  item_images: z.array(z.string()).min(1, "Item must have at least one image."),
+});

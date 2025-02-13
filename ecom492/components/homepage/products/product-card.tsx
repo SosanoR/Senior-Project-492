@@ -5,6 +5,7 @@ import ProductImage from "./product-image";
 import { ProductCardProps } from "@/_common/types";
 
 const ProductCard = ({
+  _id,
   item_name,
   item_image,
   item_price,
@@ -14,7 +15,7 @@ const ProductCard = ({
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="p-0 items-center">
-        <Link href={`/products/${item_name}`}>
+        <Link href={`/result/${_id}`}>
           <ProductImage item_image={item_image} item_name={item_name} />
         </Link>
       </CardHeader>
