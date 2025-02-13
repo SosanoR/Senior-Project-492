@@ -1,7 +1,9 @@
-import Image from "next/image";
-import run from "@/db/MongoDB"
+import { getLatest } from "@/lib/actions/product.actions";
+import ProductList from "@/components/homepage/products/product-list";
 export default async function Home() {
-  const db = await run();
-  cosnt collection = db.collection('items')
-  return <></>;
+  const productResultsLimit = 4;
+  const res = await getLatest(productResultsLimit);
+  return <>
+    <ProductList products={res ? res : []} title="Best Selling" limit={productResultsLimit} />
+  </>;
 }

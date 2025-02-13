@@ -13,7 +13,7 @@ async function run() {
       return client.db('testDB')
     } finally {
       // Ensures that the client will close when you finish/error
-      // await client.close();
+    //   await client.close();
     }
   }
 
