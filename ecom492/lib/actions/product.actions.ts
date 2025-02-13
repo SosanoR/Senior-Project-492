@@ -43,12 +43,11 @@ export async function getLatest(limit: number) {
 export async function findProduct(id: string) {
   try {
     await client.connect();
-    
+
     const collection = client.db("testDB").collection<item_data>("items");
     const product = await collection.findOne<item_data>(new ObjectId(id));
 
     return product;
-
   } catch (error) {
     console.log(error);
   } finally {

@@ -21,7 +21,7 @@ const ProductCard = ({
       </CardHeader>
 
       <CardContent className="p-4 grid gap-4">
-        <Link href={`/products/${item_name}`}>
+        <Link href={`/result/${_id}`}>
           <h2 className="text-sm font-medium">{item_name}</h2>
         </Link>
         <div className="flex-between gap-4">

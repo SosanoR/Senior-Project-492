@@ -19,7 +19,7 @@ export type item_data = {
   user_id: string;
   item_discount: number;
   item_price: number;
-  item_image: string;
+  item_image: string[];
 };
 
 export interface ProductCardProps {

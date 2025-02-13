@@ -14,12 +14,8 @@ const ProductImage = ({ item_image, item_name }: ProductImageProps) => {
       width={300}
       height={300}
       priority
-      crop={{
-        type: "pad",
-        gravity: "center",
-        height: 300,
-        width: 300,
-      }}   
+      crop="pad"  
+      gravity="center"
       removeBackground
       
     />
