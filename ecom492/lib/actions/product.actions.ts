@@ -1,7 +1,7 @@
 "use server";
 import { MongoClient } from "mongodb";
 import { MONGODB_URI } from "../constants";
-import { item_data } from "@/_common/types";
+import { item_data, ProductCardProps } from "@/_common/types";
 
 if (!MONGODB_URI) {
   throw new Error("MongoDB connection string is undefined");
@@ -15,7 +15,7 @@ export async function getLatest(limit: number) {
     const collection = client.db("testDB").collection<item_data>("items");
 
     const data = await collection
-      .find<item_data>(
+      .find<ProductCardProps>(
         {},
         {
           sort: { units_sold: -1 },

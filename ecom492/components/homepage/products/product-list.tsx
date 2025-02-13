@@ -1,21 +1,26 @@
 import ProductCard from "./product-card";
-import { item_data } from "@/_common/types";
+import { ProductCardProps } from "@/_common/types";
+
 interface ProductListProps {
-  products: item_data[];
+  products: ProductCardProps[];
   title?: string;
-  limit?: number;
 }
 
-const ProductList = ({ products, title, limit }: ProductListProps) => {
-  const limitedProducts = limit ? products.slice(0, limit) : products;
-
+const ProductList = ({ products, title }: ProductListProps) => {
   return (
     <div>
       <h2 className="h2-bold mb-4">{title}</h2>
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {limitedProducts.map((product: item_data, key: React.Key) => (
-            <ProductCard key={key} product={product} />
+          {products.map((product: ProductCardProps, key: React.Key) => (
+            <ProductCard
+              key={key}
+              item_image={product.item_image}
+              item_name={product.item_name}
+              item_price={product.item_price}
+              item_quantity={product.item_quantity}
+              average_rating={product.average_rating}
+            />
           ))}
         </div>
       ) : (
