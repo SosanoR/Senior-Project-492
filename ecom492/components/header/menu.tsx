@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import ModeToggle from "./mode-toggle";
 import Link from "next/link";
 import {
-  EllipsisVertical,
+  SquareMenu,
   ShoppingCart,
   ShoppingCartIcon,
   UserIcon,
@@ -35,7 +35,7 @@ const Menu = () => {
       <nav className="md:hidden">
         <Sheet>
           <SheetTrigger className="align-middle">
-            <EllipsisVertical />
+            <SquareMenu />
           </SheetTrigger>
 
           <SheetContent className="flex flex-col items-start">

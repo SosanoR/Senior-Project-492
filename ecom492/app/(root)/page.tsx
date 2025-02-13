@@ -1,5 +1,7 @@
 import Image from "next/image";
-
-export default function Home() {
+import run from "@/db/MongoDB"
+export default async function Home() {
+  const db = await run();
+  cosnt collection = db.collection('items')
   return <></>;
 }
