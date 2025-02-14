@@ -9,7 +9,7 @@ interface ProductImageProps {
 const ProductImage = ({ item_image, item_name }: ProductImageProps) => {
   return (
     <CldImage
-      src={item_image}
+      src={item_image[0]}
       alt={item_name}
       width={300}
       height={300}

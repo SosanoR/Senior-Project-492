@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ProductPrice from "./product-price";
 import ProductImage from "./product-image";
 import { ProductCardProps } from "@/_common/types";
+import { formatToTitleCase } from "@/lib/utils";
 
 const ProductCard = ({
   _id,
@@ -22,7 +23,7 @@ const ProductCard = ({
 
       <CardContent className="p-4 grid gap-4">
         <Link href={`/result/${_id}`}>
-          <h2 className="text-sm font-medium">{item_name}</h2>
+          <h2 className="text-sm font-medium">{formatToTitleCase(item_name)}</h2>
         </Link>
         <div className="flex-between gap-4">
           <p>{average_rating} stars</p>
