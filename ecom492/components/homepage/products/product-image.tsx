@@ -2,7 +2,7 @@
 import { CldImage } from "next-cloudinary";
 
 interface ProductImageProps {
-  item_image: string;
+  item_image: string[];
   item_name: string;
 }
 

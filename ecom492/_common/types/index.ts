@@ -1,5 +1,4 @@
-import {z} from "zod"
-
+import { z } from "zod";
 
 export type item_data = {
   item_name: string;
@@ -25,8 +24,15 @@ export type item_data = {
 export interface ProductCardProps {
   _id: string;
   item_name: string;
-  item_image: string;
+  item_image: string[];
   average_rating: number;
   item_price: number;
   item_quantity: number;
 }
+
+export type user_data = {
+  _id: string;
+  name: string;
+  email: string;
+  password: string;
+};
