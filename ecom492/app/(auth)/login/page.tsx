@@ -1,3 +1,4 @@
+import LoginForm from "@/components/login/login-form";
 import {
   Card,
   CardContent,
@@ -7,12 +8,25 @@ import {
 } from "@/components/ui/card";
 import { Metadata } from "next";
 import Link from "next/link";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Login",
 };
 
-const LoginPage = () => {
+const LoginPage = async (props: {
+  searchParams: Promise<{
+    callbackUrl: string;
+  }>;
+}) => {
+  const { callbackUrl } = await props.searchParams;
+  const session = await auth();
+
+  if (session) {
+    return redirect(callbackUrl || "/");
+  }
+
   return (
     <div className="w-fill max-w-md mx-auto">
       <Card>
@@ -25,7 +39,9 @@ const LoginPage = () => {
             Login to your account
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">{/* Form */}</CardContent>
+        <CardContent className="space-y-4">
+          <LoginForm />
+        </CardContent>
       </Card>
     </div>
   );

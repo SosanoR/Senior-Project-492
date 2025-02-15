@@ -35,9 +35,10 @@ export async function getLatest(limit: number) {
     return data;
   } catch (error) {
     console.log(error);
-  } finally {
-    await client.close();
-  }
+  } 
+  // finally {
+  //   await client.close();
+  // }
 }
 
 export async function findProduct(id: string) {
@@ -50,7 +51,8 @@ export async function findProduct(id: string) {
     return product;
   } catch (error) {
     console.log(error);
-  } finally {
-    await client.close();
-  }
+  } 
+  // finally {
+  //   await client.close();
+  // }
 }
