@@ -15,3 +15,10 @@ export const signInDefaultValues = {
   email: "",
   password: "",
 };
+
+export const registrationDefaultValues = {
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};

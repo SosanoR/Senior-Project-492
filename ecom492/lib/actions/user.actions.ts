@@ -1,8 +1,10 @@
 "use server";
 
-import { signInFormSchema } from "../validators";
+import { registerFormSchema, signInFormSchema } from "../validators";
 import { signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import * as argon2 from "argon2";
+import client from "../db";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -28,4 +30,28 @@ export async function signInWithCredentials(
 // Sign out user
 export async function signUserOut() {
   await signOut();
+}
+
+// Register user
+export async function registerUser(prevState: unknown, formData: FormData) {
+  try {
+    const user = registerFormSchema.parse({
+      name: formData.get("name"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
+    });
+    user.password = await argon2.hash(user.password);
+    await client.db("testDB").collection("User").insertOne({
+      name: user.name,
+      email: user.email,
+      password: user.password,
+    });
+    return { success: true, message: "User registered successfully." };
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    return { success: false, message: "Registration failed." };
+  }
 }

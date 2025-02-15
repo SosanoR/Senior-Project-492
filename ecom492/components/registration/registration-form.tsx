@@ -3,15 +3,15 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { signInDefaultValues } from "@/lib/constants";
+import { registrationDefaultValues } from "@/lib/constants";
 import Link from "next/link";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { signInWithCredentials } from "@/lib/actions/user.actions";
+import { registerUser } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
 
-const LoginForm = () => {
-  const [data, action] = useActionState(signInWithCredentials, {
+const RegistrationForm = () => {
+  const [data, action] = useActionState(registerUser, {
     success: false,
     message: "",
   });
@@ -19,11 +19,11 @@ const LoginForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  const LoginButton = () => {
+  const RegisterButton = () => {
     const { pending } = useFormStatus();
     return (
       <Button disabled={pending} className="w-full" variant="default">
-        {pending ? "Signing in..." : "Login"}
+        {pending ? "Submitting..." : "Register"}
       </Button>
     );
   };
@@ -32,6 +32,19 @@ const LoginForm = () => {
     <form action={action}>
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
       <div className="space-y-6">
+
+      <div>
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            name="name"
+            type="text"
+            required
+            autoComplete="name"
+            defaultValue={registrationDefaultValues.name}
+          />
+        </div>
+
         <div>
           <Label htmlFor="email">Email</Label>
           <Input
@@ -40,7 +53,7 @@ const LoginForm = () => {
             type="email"
             required
             autoComplete="email"
-            defaultValue={signInDefaultValues.email}
+            defaultValue={registrationDefaultValues.email}
           />
         </div>
 
@@ -52,12 +65,24 @@ const LoginForm = () => {
             type="password"
             required
             autoComplete="password"
-            defaultValue={signInDefaultValues.password}
+            defaultValue={registrationDefaultValues.password}
           />
         </div>
 
         <div>
-          <LoginButton />
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            required
+            autoComplete="confirmPassword"
+            defaultValue={registrationDefaultValues.confirmPassword}
+          />
+        </div>
+
+        <div>
+          <RegisterButton />
         </div>
 
         {data && !data.success && (
@@ -65,9 +90,9 @@ const LoginForm = () => {
         )}
 
         <div className="text-sm text-center text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" target="_self" className="link">
-            Register Here
+          Already have an account?{" "}
+          <Link href="/login" target="_self" className="link">
+            Log in Here
           </Link>
         </div>
       </div>
@@ -75,4 +100,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default RegistrationForm;

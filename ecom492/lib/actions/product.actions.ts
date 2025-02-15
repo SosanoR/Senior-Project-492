@@ -1,17 +1,17 @@
 "use server";
-import { MongoClient, ObjectId } from "mongodb";
-import { MONGODB_URI } from "../constants";
+import { ObjectId } from "mongodb";
 import { item_data, ProductCardProps } from "@/_common/types";
+import client from "../db";
 
-if (!MONGODB_URI) {
-  throw new Error("MongoDB connection string is undefined");
-}
-const client = new MongoClient(MONGODB_URI);
+// if (!MONGODB_URI) {
+//   throw new Error("MongoDB connection string is undefined");
+// }
+// const client = new MongoClient(MONGODB_URI);
 
 // Get latest Products
 export async function getLatest(limit: number) {
   try {
-    await client.connect();
+    // await client.connect();
     const collection = client.db("testDB").collection<item_data>("items");
 
     const data = await collection
@@ -43,7 +43,7 @@ export async function getLatest(limit: number) {
 
 export async function findProduct(id: string) {
   try {
-    await client.connect();
+    // await client.connect();
 
     const collection = client.db("testDB").collection<item_data>("items");
     const product = await collection.findOne<item_data>(new ObjectId(id));
