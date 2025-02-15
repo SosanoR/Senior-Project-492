@@ -1,5 +1,5 @@
-import Header from "@/components/header/index";
-import Footer from "@/components/footer/index";
+import Header from "@/_components/header/index";
+import Footer from "@/_components/footer/index";
 export default function RootLayout({
   children,
 }: Readonly<{

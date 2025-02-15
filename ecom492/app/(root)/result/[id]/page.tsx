@@ -1,10 +1,10 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import ProductPrice from "@/components/homepage/products/product-price";
+import { Badge } from "@/_components/ui/badge";
+import { Button } from "@/_components/ui/button";
+import { Card, CardContent } from "@/_components/ui/card";
+import ProductPrice from "@/_components/homepage/products/product-price";
 import { findProduct } from "@/lib/actions/product.actions";
 import { notFound } from "next/navigation";
-import ProductImages from "@/components/result-page/product-images";
+import ProductImages from "@/_components/result-page/product-images";
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ id: string }>;
