@@ -1,4 +1,4 @@
-import { Button } from "@/_components/ui/button";
+import { Button } from "@/components/ui/button";
 import ModeToggle from "./mode-toggle";
 import Link from "next/link";
 import {
@@ -13,7 +13,7 @@ import {
   SheetDescription,
   SheetTitle,
   SheetTrigger,
-} from "@/_components/ui/sheet";
+} from "@/components/ui/sheet";
 
 const Menu = () => {
   return (

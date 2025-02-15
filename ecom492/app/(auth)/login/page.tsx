@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/_components/ui/card";
+} from "@/components/ui/card";
 import { Metadata } from "next";
 import Link from "next/link";
 
