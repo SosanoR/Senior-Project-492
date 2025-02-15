@@ -1,0 +1,69 @@
+import NextAuth from "next-auth";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import CredentialsProvider from "next-auth/providers/credentials";
+import * as argon2 from "argon2";
+import client from "./lib/db";
+import { user_data } from "./_common/types";
+import type { NextAuthConfig } from "next-auth";
+
+export const config = {
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60,
+  },
+  adapter: MongoDBAdapter(client),
+  providers: [
+    CredentialsProvider({
+      credentials: {
+        email: { type: "email" },
+        password: { type: "password" },
+      },
+      async authorize(credentials) {
+        if (credentials == null) {
+          return null;
+        }
+        const user = await client
+          .db("testDB")
+          .collection("User")
+          .findOne<user_data>({ email: credentials.email as string });
+
+        if (user && user.password) {
+          try {
+            const verfied = await argon2.verify(
+              user.password,
+              credentials.password as string
+            );
+
+            if (verfied) {
+              // TODO: return role when available
+              return {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+              };
+            }
+          } catch (error) {
+            console.log(error);
+            return null;
+          }
+        }
+        return null;
+      },
+    }),
+  ],
+  callbacks: {
+    async session({ session, user, trigger, token }: any) {
+      session.user.id = token.sub;
+      if (trigger === "update") {
+        session.user.name = user.name;
+      }
+      return session;
+    },
+  },
+} satisfies NextAuthConfig;
+
+export const { handlers, auth, signIn, signOut } = NextAuth(config);
