@@ -5,8 +5,6 @@ import {
   SquareMenu,
   ShoppingCart,
   ShoppingCartIcon,
-  UserIcon,
-  User,
 } from "lucide-react";
 import {
   Sheet,
