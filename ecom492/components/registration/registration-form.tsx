@@ -8,10 +8,11 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { registerUser } from "@/lib/actions/user.actions";
-import { redirect, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Slide, toast } from "react-toastify";
 
 const RegistrationForm = () => {
+  const router = useRouter();
   const [data, action] = useActionState(registerUser, {
     success: false,
     message: "",
@@ -30,20 +31,18 @@ const RegistrationForm = () => {
   };
 
   if (data.success) {
-    const notify = () =>
-      toast.success(data.message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Slide,
-      });
-    notify();
-    return redirect("/login");
+    toast.success(data.message, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Slide,
+    });
+    router.push("/login")
   }
 
   return (
