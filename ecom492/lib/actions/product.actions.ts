@@ -41,6 +41,7 @@ export async function getLatest(limit: number) {
   // }
 }
 
+// Find single product
 export async function findProduct(id: string) {
   try {
     // await client.connect();

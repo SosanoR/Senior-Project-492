@@ -13,11 +13,15 @@ const ProductCard = ({
   item_quantity,
   average_rating,
 }: ProductCardProps) => {
+  const image_width = 300;
+  const image_height = 300;
+
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="p-0 items-center">
         <Link href={`/result/${_id}`}>
-          <ProductImage item_image={item_image} item_name={item_name} />
+          <ProductImage item_image={item_image} item_name={item_name} width={image_width} height={image_height} />
         </Link>
       </CardHeader>
 
