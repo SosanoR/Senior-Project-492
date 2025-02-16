@@ -57,12 +57,13 @@ export async function registerUser(prevState: unknown, formData: FormData) {
         name: user.name,
         email: user.email,
         password: user.password,
+        role: "user",
       });
     } else {
       throw new DuplicateAccountError();
     }
 
-    return { success: true, message: "User registered successfully." };
+    return { success: true, message: "Registered Successfully." };
   } catch (error) {
 
     if (isRedirectError(error)) {

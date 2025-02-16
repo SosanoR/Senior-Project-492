@@ -8,7 +8,8 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { registerUser } from "@/lib/actions/user.actions";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
+import { Slide, toast } from "react-toastify";
 
 const RegistrationForm = () => {
   const [data, action] = useActionState(registerUser, {
@@ -28,75 +29,93 @@ const RegistrationForm = () => {
     );
   };
 
+  if (data.success) {
+    const notify = () =>
+      toast.success(data.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Slide,
+      });
+    notify();
+    return redirect("/login");
+  }
+
   return (
-    <form action={action}>
-      <input type="hidden" name="callbackUrl" value={callbackUrl} />
-      <div className="space-y-6">
+    <>
+      <form action={action}>
+        <input type="hidden" name="callbackUrl" value={callbackUrl} />
+        <div className="space-y-6">
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              required
+              autoComplete="name"
+              defaultValue={registrationDefaultValues.name}
+            />
+          </div>
 
-      <div>
-          <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            required
-            autoComplete="name"
-            defaultValue={registrationDefaultValues.name}
-          />
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              defaultValue={registrationDefaultValues.email}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              required
+              autoComplete="password"
+              defaultValue={registrationDefaultValues.password}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              autoComplete="confirmPassword"
+              defaultValue={registrationDefaultValues.confirmPassword}
+            />
+          </div>
+
+          <div>
+            <RegisterButton />
+          </div>
+
+          {data && !data.success && (
+            <div className="text-center text-destructive">{data.message}</div>
+          )}
+
+          <div className="text-sm text-center text-muted-foreground">
+            Already have an account?{" "}
+            <Link href="/login" target="_self" className="link">
+              Log in Here
+            </Link>
+          </div>
         </div>
-
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            defaultValue={registrationDefaultValues.email}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            required
-            autoComplete="password"
-            defaultValue={registrationDefaultValues.password}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            required
-            autoComplete="confirmPassword"
-            defaultValue={registrationDefaultValues.confirmPassword}
-          />
-        </div>
-
-        <div>
-          <RegisterButton />
-        </div>
-
-        {data && !data.success && (
-          <div className="text-center text-destructive">{data.message}</div>
-        )}
-
-        <div className="text-sm text-center text-muted-foreground">
-          Already have an account?{" "}
-          <Link href="/login" target="_self" className="link">
-            Log in Here
-          </Link>
-        </div>
-      </div>
-    </form>
+      </form>
+    </>
   );
 };
 

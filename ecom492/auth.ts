@@ -5,8 +5,9 @@ import * as argon2 from "argon2";
 import client from "./lib/db";
 import { user_data } from "./_common/types";
 import type { NextAuthConfig } from "next-auth";
+import { ObjectId } from "mongodb";
 
-export const config = {
+const config = {
   pages: {
     signIn: "/login",
     error: "/login",
@@ -44,6 +45,7 @@ export const config = {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
               };
             }
           } catch (error) {
@@ -58,10 +60,30 @@ export const config = {
   callbacks: {
     async session({ session, user, trigger, token }: any) {
       session.user.id = token.sub;
+      session.user.role = token.role;
+      session.user.name = token.name;
+
+      console.log(token);
+
       if (trigger === "update") {
         session.user.name = user.name;
       }
       return session;
+    },
+    async jwt({ token, user, trigger, session }: any) {
+      if (user) {
+        token.role = user.role;
+        if (user.name === "") {
+          token.name = user.email.split("@")[0];
+          const filter = { _id: new ObjectId(token.sub) };
+          const updateName = { $set: { name: token.name } };
+          await client
+            .db("testDB")
+            .collection("User")
+            .updateOne(filter, updateName);
+        }
+      }
+      return token;
     },
   },
 } satisfies NextAuthConfig;
