@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { APP_NAME } from "@/lib/constants";
 import Menu from "./menu";
+import SearchBar from "./searchbar";
 
 const Header = () => {
   return (
@@ -21,6 +22,7 @@ const Header = () => {
             </span>
           </Link>
         </div>
+        <SearchBar />
         <Menu />
       </div>
     </header>

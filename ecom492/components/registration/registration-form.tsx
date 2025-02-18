@@ -10,8 +10,10 @@ import { useFormStatus } from "react-dom";
 import { registerUser } from "@/lib/actions/user.actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Slide, toast } from "react-toastify";
+import { useTheme } from "next-themes";
 
 const RegistrationForm = () => {
+  const theme = useTheme();
   const router = useRouter();
   const [data, action] = useActionState(registerUser, {
     success: false,
@@ -39,10 +41,10 @@ const RegistrationForm = () => {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      theme: "dark",
+      theme: theme.theme === "light" ? "dark" : "light",
       transition: Slide,
     });
-    router.push("/login")
+    router.push("/login");
   }
 
   return (

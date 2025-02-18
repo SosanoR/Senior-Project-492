@@ -30,7 +30,6 @@ export interface ProductCardProps {
   item_quantity: number;
 }
 
-// TODO: add role field to user schema
 export type user_data = {
   _id: string;
   name: string;
@@ -38,3 +37,8 @@ export type user_data = {
   password: string;
   role: string;
 };
+
+export interface suggestionsProps {
+  _id: string;
+  item_name: string;
+}
