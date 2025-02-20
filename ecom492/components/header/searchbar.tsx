@@ -63,6 +63,7 @@ const SearchBar = () => {
                       <CommandItem
                         key={item.item_name}
                         onSelect={(text) => changeInputValue(text, item._id)}
+                        className="hover:cursor-pointer"
                       >
                         {item.item_name}
                       </CommandItem>

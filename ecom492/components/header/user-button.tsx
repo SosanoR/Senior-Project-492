@@ -49,6 +49,18 @@ const UserButton = async () => {
               </div>
             </div>
           </DropdownMenuLabel>
+
+          <Link href={`/admin/products/`}>
+            <DropdownMenuItem className="p-0 mb-1">
+              <Button
+                className="w-full py-4 px-2 h-4 justify-start"
+                variant="ghost"
+              >
+                Seller Portal
+              </Button>
+            </DropdownMenuItem>
+          </Link>
+
           <DropdownMenuItem className="p-0 mb-1">
             <form action={signUserOut} className="w-full">
               <Button

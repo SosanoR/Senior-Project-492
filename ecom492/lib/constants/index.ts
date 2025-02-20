@@ -22,3 +22,5 @@ export const registrationDefaultValues = {
   password: "",
   confirmPassword: "",
 };
+
+export const PAGE_SIZE = 5;

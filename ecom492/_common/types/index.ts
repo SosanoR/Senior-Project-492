@@ -42,3 +42,20 @@ export interface suggestionsProps {
   _id: string;
   item_name: string;
 }
+
+export interface userProductQuery {
+  query: string;
+  limit?: number;
+  page: number;
+  category?: string;
+  user_id?: string;
+}
+
+export interface userProductData {
+  _id: string;
+  item_name: string;
+  item_price: number;
+  category: string[];
+  item_quantity: number;
+  average_rating: number;
+}

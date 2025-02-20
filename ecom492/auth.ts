@@ -40,7 +40,6 @@ const config = {
             );
 
             if (verfied) {
-              // TODO: return role when available
               return {
                 id: user._id,
                 name: user.name,
@@ -62,8 +61,6 @@ const config = {
       session.user.id = token.sub;
       session.user.role = token.role;
       session.user.name = token.name;
-
-      console.log(token);
 
       if (trigger === "update") {
         session.user.name = user.name;
