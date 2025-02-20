@@ -43,7 +43,7 @@ const AdminProductsPage = async (props: {
 
   const res = await getAllUserProducts({
     query: searchText,
-    // limit: 15,
+    // limit: 2,
     page,
     category,
     user_id: session.user?.id,
@@ -57,9 +57,13 @@ const AdminProductsPage = async (props: {
     );
   }
 
+  
   const products: { data: userProductData[]; totalPages: number } =
-    JSON.parse(res);
-
+  JSON.parse(res);
+if (page > products.totalPages || page < 1) {
+    console.log(page)
+    return redirect("/admin/products?page=1")
+}
   return (
     <div className="space-y-2">
       <div className="flex-between">
@@ -108,12 +112,12 @@ const AdminProductsPage = async (props: {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious href={page > 1 ? `?page=${page - 1}` : `?page=1`} />
+              <PaginationPrevious href={page > 1 ? `?page=${page - 1}` : `?page=1`} className={page === 1 ? "pointer-events-none opacity-50" : ""} />
             </PaginationItem>
 
             {Array.from({ length: products.totalPages }, (_, index) => (
               <PaginationItem key={index + 1}>
-                <PaginationLink href={`?page=${index + 1}`}>
+                <PaginationLink href={`?page=${index + 1}`} isActive={page === index + 1}>
                   {index + 1}
                 </PaginationLink>
               </PaginationItem>
@@ -124,7 +128,7 @@ const AdminProductsPage = async (props: {
             </PaginationItem> */}
 
             <PaginationItem>
-              <PaginationNext href={page !== products.totalPages ? `?page=${page + 1}`: `?page=${products.totalPages}`} />
+              <PaginationNext href={page !== products.totalPages ? `?page=${page + 1}`: `?page=${products.totalPages}`} className={page === products.totalPages ? "pointer-events-none opacity-50" : ""} />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
