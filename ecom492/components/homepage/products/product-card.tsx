@@ -7,34 +7,36 @@ import { formatToTitleCase } from "@/lib/utils";
 
 const ProductCard = ({
   _id,
-  item_name,
-  item_image,
-  item_price,
-  item_quantity,
+  name,
+  images,
+  price,
+  quantity,
   average_rating,
 }: ProductCardProps) => {
   const image_width = 300;
   const image_height = 300;
 
-
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="p-0 items-center">
         <Link href={`/result/${_id}`}>
-          <ProductImage item_image={item_image} item_name={item_name} width={image_width} height={image_height} />
+          <ProductImage
+            images={images}
+            name={name}
+            width={image_width}
+            height={image_height}
+          />
         </Link>
       </CardHeader>
 
       <CardContent className="p-4 grid gap-4">
         <Link href={`/result/${_id}`}>
-          <h2 className="text-sm font-medium">
-            {formatToTitleCase(item_name)}
-          </h2>
+          <h2 className="text-sm font-medium">{formatToTitleCase(name)}</h2>
         </Link>
         <div className="flex-between gap-4">
           <p>{average_rating} stars</p>
-          {item_quantity > 0 ? (
-            <ProductPrice value={item_price} />
+          {quantity > 0 ? (
+            <ProductPrice value={price} />
           ) : (
             <p className="text-destructive">Out of Stock</p>
           )}

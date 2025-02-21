@@ -16,10 +16,10 @@ const ProductList = ({ products, title }: ProductListProps) => {
             <ProductCard
               key={key}
               _id={product._id}
-              item_image={product.item_image}
-              item_name={product.item_name}
-              item_price={product.item_price}
-              item_quantity={product.item_quantity}
+              images={product.images}
+              name={product.name}
+              price={product.price}
+              quantity={product.quantity}
               average_rating={product.average_rating}
             />
           ))}

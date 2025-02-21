@@ -10,7 +10,6 @@ import { PRODUCT_DISPLAY_LIMIT } from "@/lib/constants";
 export default async function Home() {
   const res = await getLatest(PRODUCT_DISPLAY_LIMIT);
   // const session = await auth();
-
   return (
     <>
       <div className="space-y-5">

@@ -2,7 +2,7 @@
 
 import { ObjectId } from "mongodb";
 import {
-  item_data,
+  data,
   ProductCardProps,
   suggestionsProps,
   userProductData,
@@ -18,8 +18,7 @@ import { insertProductSchema, updateProductSchema } from "../validators";
 // Get latest Products
 export async function getLatest(limit: number) {
   try {
-
-    const collection = client.db("testDB").collection<item_data>("items");
+    const collection = client.db("testDB").collection<data>("items");
 
     const data = await collection
       .find<ProductCardProps>(
@@ -28,11 +27,11 @@ export async function getLatest(limit: number) {
           sort: { units_sold: -1 },
           projection: {
             _id: 1,
-            item_name: 1,
-            item_image: 1,
+            name: 1,
+            images: 1,
             average_rating: 1,
-            item_price: 1,
-            item_quantity: 1,
+            price: 1,
+            quantity: 1,
           },
         }
       )
@@ -50,8 +49,8 @@ export async function findProduct(id: string) {
   try {
     // await client.connect();
 
-    const collection = client.db("testDB").collection<item_data>("items");
-    const product = await collection.findOne<item_data>(new ObjectId(id));
+    const collection = client.db("testDB").collection<data>("items");
+    const product = await collection.findOne<data>(new ObjectId(id));
 
     return product;
   } catch (error) {
@@ -63,13 +62,13 @@ export async function findProduct(id: string) {
 export async function getAutocompleteSuggestions(query: string) {
   try {
     if (query.length > 3 && query !== undefined) {
-      const collection = client.db("testDB").collection<item_data>("items");
+      const collection = client.db("testDB").collection<data>("items");
 
       const data = await collection
         .find<suggestionsProps>(
-          { item_name: { $regex: query, $options: "i" } },
+          { name: { $regex: query, $options: "i" } },
           {
-            projection: { item_name: 1 },
+            projection: { name: 1 },
           }
         )
         .limit(5)
@@ -85,58 +84,60 @@ export async function getAutocompleteSuggestions(query: string) {
 // Create a user product
 export async function createProduct(data: z.infer<typeof insertProductSchema>) {
   try {
-
     const product = insertProductSchema.parse(data);
-    const collection = client.db("testDB").collection<item_data>("items");
+    const collection = client.db("testDB").collection<data>("items");
     await collection.insertOne(product);
 
     revalidatePath("/admin/products");
-    return {success: true, message: "Product created successfully."}
+    return { success: true, message: "Product created successfully." };
   } catch (error) {
     console.log(error);
-    return {success: false, message: formatError(error)}
+    return { success: false, message: formatError(error) };
   }
 }
 
 // Update a user product
 export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
   try {
-
     const product = updateProductSchema.parse(data);
-    const collection = client.db("testDB").collection<item_data>("items");
-    const productExists = await collection.findOne({_id: new ObjectId(product._id)}) 
+    const collection = client.db("testDB").collection<data>("items");
+    const productExists = await collection.findOne({
+      _id: new ObjectId(product._id),
+    });
 
     if (!productExists) {
-      throw new Error("Product not found.")
+      throw new Error("Product not found.");
     }
 
-    await collection.updateOne({_id: productExists._id}, {
-      $set: {
-        name: product.name,
-        description: product.description,
-        quantity: product.quantity,
-        price: product.price,
-        brand: product.brand,
-        category: product.category,
-        images: product.images,
+    await collection.updateOne(
+      { _id: productExists._id },
+      {
+        $set: {
+          name: product.name,
+          description: product.description,
+          quantity: product.quantity,
+          price: Number(product.price),
+          brand: product.brand,
+          categories: product.categories,
+          images: product.images,
+        },
       }
-    })
+    );
 
     revalidatePath("/admin/products");
-    return {success: true, message: "Product created successfully."}
+    return { success: true, message: "Product created successfully." };
   } catch (error) {
     console.log(error);
-    return {success: false, message: formatError(error)}
+    return { success: false, message: formatError(error) };
   }
 }
-
 
 // Return user's products
 export async function getAllUserProducts({
   query,
   limit = PAGE_SIZE,
   page,
-  category,
+  categories,
   user_id,
 }: userProductQuery) {
   try {
@@ -153,10 +154,10 @@ export async function getAllUserProducts({
       {
         $project: {
           _id: 1,
-          item_name: 1,
-          item_price: 1,
-          category: 1,
-          item_quantity: 1,
+          name: 1,
+          price: 1,
+          categories: 1,
+          quantity: 1,
           average_rating: 1,
         },
       },
@@ -168,7 +169,7 @@ export async function getAllUserProducts({
       },
     ];
 
-    const collection = client.db("testDB").collection<item_data>("items");
+    const collection = client.db("testDB").collection<data>("items");
 
     const data = await collection
       .aggregate<{
@@ -192,7 +193,7 @@ export async function getAllUserProducts({
 // Delete user's product
 export async function deleteUserProduct(id: string) {
   try {
-    const collection = client.db("testDB").collection<item_data>("items");
+    const collection = client.db("testDB").collection<data>("items");
     const product = await collection.findOne({ _id: new ObjectId(id) });
 
     if (!product) {

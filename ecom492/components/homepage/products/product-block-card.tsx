@@ -14,7 +14,7 @@ const BlockCard = ({ id, image, name }: BlockCardProps) => {
       <Card>
         <CardContent>
           <Link href={`result/${id}`}>
-            <ProductImage item_name={name} item_image={image} width={280} height={280}/>
+            <ProductImage name={name} image={image} width={280} height={280} />
           </Link>
         </CardContent>
       </Card>

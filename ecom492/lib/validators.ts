@@ -15,7 +15,9 @@ export const insertProductSchema = z.object({
   quantity: z.coerce.number(),
   price: currency,
   brand: z.string().min(3, "Brand must be at least 3 characters."),
-  category: z.array(z.string()).min(1, "Item must have at least one category."),
+  categories: z
+    .array(z.string())
+    .min(1, "Item must have at least one categories."),
   images: z.array(z.string()).min(1, "Item must have at least one image."),
 });
 

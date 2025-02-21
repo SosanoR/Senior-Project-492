@@ -61,11 +61,11 @@ const SearchBar = () => {
                   {suggestions &&
                     suggestions.map((item) => (
                       <CommandItem
-                        key={item.item_name}
+                        key={item.name}
                         onSelect={(text) => changeInputValue(text, item._id)}
                         className="hover:cursor-pointer"
                       >
-                        {item.item_name}
+                        {item.name}
                       </CommandItem>
                     ))}
                 </CommandList>

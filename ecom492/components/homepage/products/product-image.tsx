@@ -2,24 +2,23 @@
 import { CldImage } from "next-cloudinary";
 
 interface ProductImageProps {
-  item_image: string[];
-  item_name: string;
+  images: string[];
+  name: string;
   width: number;
   height: number;
 }
 
-const ProductImage = ({ item_image, item_name, width, height }: ProductImageProps) => {
+const ProductImage = ({ images, name, width, height }: ProductImageProps) => {
   return (
     <CldImage
-      src={item_image[0]}
-      alt={item_name}
+      src={images[0]}
+      alt={name}
       width={width}
       height={height}
       priority
-      crop="pad"  
+      crop="pad"
       gravity="center"
       removeBackground
-      
     />
   );
 };

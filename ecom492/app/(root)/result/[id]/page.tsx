@@ -22,13 +22,13 @@ const ProductDetailsPage = async (props: {
         <div className="grid grid-cols-1 md:grid-cols-5">
           {/* Images Col */}
           <div className="col-span-2">
-            <ProductImages images={product.item_image} />
+            <ProductImages images={product.images} />
           </div>
           {/* Details Col */}
           <div className="col-span-2 p-5">
             <div className="flex flex-col gap-6">
-              <p>Brand Category</p>
-              <h1 className="h3-bold">{product.item_name}</h1>
+              <p>Brand categories</p>
+              <h1 className="h3-bold">{product.name}</h1>
               {/* Ratings count. Note fix the count later */}
               <p>
                 {product.average_rating} stars from {product.units_sold}{" "}
@@ -36,14 +36,14 @@ const ProductDetailsPage = async (props: {
               </p>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <ProductPrice
-                  value={Number(product.item_price)}
+                  value={Number(product.price)}
                   className="w-24 rounded-full dark:bg-white dark:text-black bg-black text-white px-5 py-2"
                 />
               </div>
             </div>
             <div className="mt-10">
               <p className="font-semibold">Description</p>
-              <p>{product.item_description}</p>
+              <p>{product.description}</p>
             </div>
           </div>
           {/* Action col */}
@@ -52,17 +52,17 @@ const ProductDetailsPage = async (props: {
               <CardContent className="p-4">
                 <div className="mb-2 flex justify-between">
                   <div>Price</div>
-                  <ProductPrice value={Number(product.item_price)} />
+                  <ProductPrice value={Number(product.price)} />
                 </div>
                 <div className="mb-2 flex justify-between">
                   <div>Status</div>
-                  {product.item_quantity > 0 ? (
+                  {product.quantity > 0 ? (
                     <Badge variant="outline">In Stock</Badge>
                   ) : (
                     <Badge variant="destructive">Out of Stock</Badge>
                   )}
                 </div>
-                {product.item_quantity > 0 && (
+                {product.quantity > 0 && (
                   <div className="flex-center">
                     <Button className="w-full">Add to Cart</Button>
                   </div>

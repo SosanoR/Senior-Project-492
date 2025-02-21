@@ -1,33 +1,23 @@
-import { z } from "zod";
-
-export type item_data = {
-  item_name: string;
-  item_description: string;
-  item_attributes: {
-    [key: string]: string;
-  };
-  dimension_unit: string;
-  length: number;
-  width: number;
-  height: number;
-  weight_unit: string;
-  item_weight: number;
-  item_quantity: number;
+export type data = {
+  name: string;
+  description: string;
+  quantity: number;
   average_rating: number;
   units_sold: number;
   user_id: string;
-  item_discount: number;
-  item_price: number;
-  item_image: string[];
+  discount: number;
+  price: number;
+  images: string[];
+  brand: string;
 };
 
 export interface ProductCardProps {
   _id: string;
-  item_name: string;
-  item_image: string[];
+  name: string;
+  images: string[];
   average_rating: number;
-  item_price: number;
-  item_quantity: number;
+  price: number;
+  quantity: number;
 }
 
 export type user_data = {
@@ -40,22 +30,22 @@ export type user_data = {
 
 export interface suggestionsProps {
   _id: string;
-  item_name: string;
+  name: string;
 }
 
 export interface userProductQuery {
   query: string;
   limit?: number;
   page: number;
-  category?: string;
+  categories?: string;
   user_id?: string;
 }
 
 export interface userProductData {
   _id: string;
-  item_name: string;
-  item_price: number;
-  category: string[];
-  item_quantity: number;
+  name: string;
+  price: number;
+  categories: string[];
+  quantity: number;
   average_rating: number;
 }

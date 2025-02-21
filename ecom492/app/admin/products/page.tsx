@@ -30,7 +30,7 @@ const AdminProductsPage = async (props: {
   searchParams: Promise<{
     page: string;
     query: string;
-    category: string;
+    categories: string;
     token: string;
   }>;
 }) => {
@@ -38,7 +38,7 @@ const AdminProductsPage = async (props: {
   const session = await auth();
   const page = Number(searchParams.page) || 1;
   const searchText = searchParams.query || "";
-  const category = searchParams.category || "";
+  const categories = searchParams.categories || "";
 
   if (!session) {
     return redirect("/login");
@@ -48,7 +48,7 @@ const AdminProductsPage = async (props: {
     query: searchText,
     // limit: 2,
     page,
-    category,
+    categories,
     user_id: session.user?.id,
   });
 
@@ -80,7 +80,7 @@ const AdminProductsPage = async (props: {
             <TableHead>ID</TableHead>
             <TableHead>NAME</TableHead>
             <TableHead>PRICE</TableHead>
-            <TableHead>CATEGORY</TableHead>
+            <TableHead>categories</TableHead>
             <TableHead>QUANTITY</TableHead>
             <TableHead>RATING</TableHead>
             <TableHead className="w-[100px]">ACTIONS</TableHead>
@@ -90,16 +90,14 @@ const AdminProductsPage = async (props: {
           {products?.data.map((product) => (
             <TableRow key={product._id}>
               <TableCell>{product._id}</TableCell>
-              <TableCell>{product.item_name}</TableCell>
+              <TableCell>{product.name}</TableCell>
+              <TableCell>${formatNumberWithPrecision(product.price)}</TableCell>
               <TableCell>
-                ${formatNumberWithPrecision(product.item_price)}
-              </TableCell>
-              <TableCell>
-                {product.category.map((cata) => (
+                {product.categories.map((cata) => (
                   <p key={cata}>{cata}</p>
                 ))}
               </TableCell>
-              <TableCell>{product.item_quantity}</TableCell>
+              <TableCell>{product.quantity}</TableCell>
               <TableCell>{product.average_rating}</TableCell>
               <TableCell className="flex gap-1">
                 <Button asChild variant="outline" size="sm">
