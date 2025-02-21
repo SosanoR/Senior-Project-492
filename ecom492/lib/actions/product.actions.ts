@@ -12,16 +12,13 @@ import client from "../db";
 import { PAGE_SIZE } from "../constants";
 import { formatError } from "../utils";
 import { revalidatePath } from "next/cache";
-
-// if (!MONGODB_URI) {
-//   throw new Error("MongoDB connection string is undefined");
-// }
-// const client = new MongoClient(MONGODB_URI);
+import { z } from "zod";
+import { insertProductSchema, updateProductSchema } from "../validators";
 
 // Get latest Products
 export async function getLatest(limit: number) {
   try {
-    // await client.connect();
+
     const collection = client.db("testDB").collection<item_data>("items");
 
     const data = await collection
@@ -46,9 +43,6 @@ export async function getLatest(limit: number) {
   } catch (error) {
     console.log(error);
   }
-  // finally {
-  //   await client.close();
-  // }
 }
 
 // Find single product
@@ -63,9 +57,6 @@ export async function findProduct(id: string) {
   } catch (error) {
     console.log(error);
   }
-  // finally {
-  //   await client.close();
-  // }
 }
 
 // Return autocomplete suggestions
@@ -90,6 +81,55 @@ export async function getAutocompleteSuggestions(query: string) {
     console.log(error);
   }
 }
+
+// Create a user product
+export async function createProduct(data: z.infer<typeof insertProductSchema>) {
+  try {
+
+    const product = insertProductSchema.parse(data);
+    const collection = client.db("testDB").collection<item_data>("items");
+    await collection.insertOne(product);
+
+    revalidatePath("/admin/products");
+    return {success: true, message: "Product created successfully."}
+  } catch (error) {
+    console.log(error);
+    return {success: false, message: formatError(error)}
+  }
+}
+
+// Update a user product
+export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
+  try {
+
+    const product = updateProductSchema.parse(data);
+    const collection = client.db("testDB").collection<item_data>("items");
+    const productExists = await collection.findOne({_id: new ObjectId(product._id)}) 
+
+    if (!productExists) {
+      throw new Error("Product not found.")
+    }
+
+    await collection.updateOne({_id: productExists._id}, {
+      $set: {
+        name: product.name,
+        description: product.description,
+        quantity: product.quantity,
+        price: product.price,
+        brand: product.brand,
+        category: product.category,
+        images: product.images,
+      }
+    })
+
+    revalidatePath("/admin/products");
+    return {success: true, message: "Product created successfully."}
+  } catch (error) {
+    console.log(error);
+    return {success: false, message: formatError(error)}
+  }
+}
+
 
 // Return user's products
 export async function getAllUserProducts({

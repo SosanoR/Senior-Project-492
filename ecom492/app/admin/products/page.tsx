@@ -19,7 +19,6 @@ import { userProductData } from "@/_common/types";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -137,10 +136,6 @@ const AdminProductsPage = async (props: {
                 </PaginationLink>
               </PaginationItem>
             ))}
-
-            {/* <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem> */}
 
             <PaginationItem>
               <PaginationNext
