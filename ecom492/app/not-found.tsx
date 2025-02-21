@@ -14,6 +14,7 @@ const NotFoundPage = () => {
         height={48}
         width={48}
         priority={true}
+        className="dark:bg-white rounded-xl"
       />
       <div className="p-6 w-1/3 rounded-lg shadow-md text-center">
         <h1 className="text-3xl font-bold">Not Found</h1>

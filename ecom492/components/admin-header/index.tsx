@@ -16,6 +16,7 @@ const Header = () => {
               height={48}
               width={48}
               priority={true}
+              className="dark:bg-white rounded-xl"
             />
           </Link>
           <span className="flex text-xl ml-3 gap-2">

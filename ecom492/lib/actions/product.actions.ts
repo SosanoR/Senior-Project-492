@@ -10,6 +10,8 @@ import {
 } from "@/_common/types";
 import client from "../db";
 import { PAGE_SIZE } from "../constants";
+import { formatError } from "../utils";
+import { revalidatePath } from "next/cache";
 
 // if (!MONGODB_URI) {
 //   throw new Error("MongoDB connection string is undefined");
@@ -89,6 +91,7 @@ export async function getAutocompleteSuggestions(query: string) {
   }
 }
 
+// Return user's products
 export async function getAllUserProducts({
   query,
   limit = PAGE_SIZE,
@@ -127,13 +130,41 @@ export async function getAllUserProducts({
 
     const collection = client.db("testDB").collection<item_data>("items");
 
-    const data = await collection.aggregate<{metadata: [{totalCount: number}], data: userProductData[]}>(pipeline).toArray();
+    const data = await collection
+      .aggregate<{
+        metadata: [{ totalCount: number }];
+        data: userProductData[];
+      }>(pipeline)
+      .toArray();
 
-    return JSON.stringify({
-      data: data[0].data,
-      totalPages: Math.ceil(data[0].metadata[0].totalCount / limit),
-    });
+    if (data[0].data.length > 0) {
+      return JSON.stringify({
+        data: data[0].data,
+        totalPages: Math.ceil(data[0].metadata[0].totalCount / limit),
+      });
+    }
+    return undefined;
   } catch (error) {
     console.log(error);
+  }
+}
+
+// Delete user's product
+export async function deleteUserProduct(id: string) {
+  try {
+    const collection = client.db("testDB").collection<item_data>("items");
+    const product = await collection.findOne({ _id: new ObjectId(id) });
+
+    if (!product) {
+      throw new Error("Product does not exist.");
+    }
+
+    await collection.deleteOne({ _id: new ObjectId(id) });
+    revalidatePath("/admin/products");
+
+    return { success: true, message: "Product deleted successfully." };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: formatError(error) };
   }
 }

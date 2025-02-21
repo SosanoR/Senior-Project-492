@@ -22,7 +22,7 @@ export function formatToTitleCase(s: string): string {
 
 // Format Errors
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function formatError(error: any) {
+export function formatError(error: any) {
   if (error.name === "ZodError") {
     // Handle zod error
     const fieldErrors = Object.keys(error.errors).map(
@@ -38,4 +38,10 @@ export async function formatError(error: any) {
         return "An error occurred. Please try again later.";
     }
   }
+}
+
+
+// Display a toast
+export function displayToast(message: string) {
+  
 }
