@@ -11,6 +11,7 @@ const config = {
   pages: {
     signIn: "/login",
     error: "/login",
+    signOut: "/"
   },
   session: {
     strategy: "jwt",

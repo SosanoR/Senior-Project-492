@@ -172,6 +172,7 @@ export async function getAllUserProducts({
   user_id,
 }: userProductQuery) {
   try {
+    console.log(`user_id: ${user_id}`)
     const pipeline = [
       {
         $search: {
@@ -209,12 +210,15 @@ export async function getAllUserProducts({
       }>(pipeline)
       .toArray();
 
+    console.log(`items found: ${data[0].data.length}`);
+
     if (data[0].data.length > 0) {
       return JSON.stringify({
         data: data[0].data,
         totalPages: Math.ceil(data[0].metadata[0].totalCount / limit),
       });
     }
+
     return undefined;
   } catch (error) {
     console.log(error);
