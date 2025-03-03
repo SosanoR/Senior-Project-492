@@ -1,4 +1,7 @@
+import type { ObjectId } from "mongodb";
+
 export type data = {
+  _id: string | ObjectId;
   name: string;
   description: string;
   quantity: number;
@@ -6,8 +9,23 @@ export type data = {
   units_sold: number;
   user_id: string;
   discount: number;
-  price: number;
+  price: string;
   images: string[];
+  category: string;
+  brand: string;
+};
+
+export type insertionData = {
+  name: string;
+  description: string;
+  quantity: number;
+  average_rating: number;
+  units_sold: number;
+  user_id: string;
+  discount: number;
+  price: string;
+  images: string[];
+  category: string;
   brand: string;
 };
 
@@ -16,7 +34,7 @@ export interface ProductCardProps {
   name: string;
   images: string[];
   average_rating: number;
-  price: number;
+  price: string;
   quantity: number;
 }
 
@@ -37,15 +55,15 @@ export interface userProductQuery {
   query: string;
   limit?: number;
   page: number;
-  categories?: string;
+  category?: string;
   user_id?: string;
 }
 
 export interface userProductData {
   _id: string;
   name: string;
-  price: number;
-  categories: string[];
+  price: string;
+  category: string;
   quantity: number;
   average_rating: number;
 }

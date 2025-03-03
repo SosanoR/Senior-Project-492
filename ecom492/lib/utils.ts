@@ -39,9 +39,3 @@ export function formatError(error: any) {
     }
   }
 }
-
-
-// Display a toast
-export function displayToast(message: string) {
-  
-}

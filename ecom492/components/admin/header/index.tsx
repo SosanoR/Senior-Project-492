@@ -23,7 +23,6 @@ const Header = () => {
             <Link href={`/`}>Overview</Link>
             <Link href={`/admin/products`}>Products</Link>
             <Link href={`/admin/orders`}>Orders</Link>
-            <Link href={`/admin/user`}>User</Link>
           </span>
         </div>
         <SearchBar />

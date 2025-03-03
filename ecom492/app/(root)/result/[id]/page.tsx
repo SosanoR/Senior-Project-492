@@ -27,7 +27,7 @@ const ProductDetailsPage = async (props: {
           {/* Details Col */}
           <div className="col-span-2 p-5">
             <div className="flex flex-col gap-6">
-              <p>Brand categories</p>
+              <p>Brand category</p>
               <h1 className="h3-bold">{product.name}</h1>
               {/* Ratings count. Note fix the count later */}
               <p>

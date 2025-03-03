@@ -13,6 +13,7 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
 interface deleteDialogProps {
   id: string;
@@ -22,6 +23,7 @@ interface deleteDialogProps {
 const DeleteDialog = ({ id, action }: deleteDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleDeletion = () => {
     startTransition(async () => {
@@ -51,6 +53,7 @@ const DeleteDialog = ({ id, action }: deleteDialogProps) => {
           theme: "colored",
           transition: Slide,
         });
+        router.push("/admin/products");
       }
     });
   };

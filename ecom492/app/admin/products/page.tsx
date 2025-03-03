@@ -14,7 +14,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { formatNumberWithPrecision } from "@/lib/utils";
+import { formatNumberWithPrecision, formatToTitleCase } from "@/lib/utils";
 import { userProductData } from "@/_common/types";
 import {
   Pagination,
@@ -30,7 +30,7 @@ const AdminProductsPage = async (props: {
   searchParams: Promise<{
     page: string;
     query: string;
-    categories: string;
+    category: string;
     token: string;
   }>;
 }) => {
@@ -38,7 +38,7 @@ const AdminProductsPage = async (props: {
   const session = await auth();
   const page = Number(searchParams.page) || 1;
   const searchText = searchParams.query || "";
-  const categories = searchParams.categories || "";
+  const category = searchParams.category || "";
 
   if (!session) {
     return redirect("/login");
@@ -48,7 +48,7 @@ const AdminProductsPage = async (props: {
     query: searchText,
     // limit: 2,
     page,
-    categories,
+    category,
     user_id: session.user?.id,
   });
 
@@ -62,9 +62,10 @@ const AdminProductsPage = async (props: {
 
   const products: { data: userProductData[]; totalPages: number } =
     JSON.parse(res);
+
   if (page > (products?.totalPages || 1) || page < 1) {
     console.log(page);
-    return redirect("/admin/products?page=1");
+    return redirect("/admin/products");
   }
   return (
     <div className="space-y-2">
@@ -80,7 +81,7 @@ const AdminProductsPage = async (props: {
             <TableHead>ID</TableHead>
             <TableHead>NAME</TableHead>
             <TableHead>PRICE</TableHead>
-            <TableHead>categories</TableHead>
+            <TableHead>category</TableHead>
             <TableHead>QUANTITY</TableHead>
             <TableHead>RATING</TableHead>
             <TableHead className="w-[100px]">ACTIONS</TableHead>
@@ -91,14 +92,14 @@ const AdminProductsPage = async (props: {
             <TableRow key={product._id}>
               <TableCell>{product._id}</TableCell>
               <TableCell>{product.name}</TableCell>
-              <TableCell>${formatNumberWithPrecision(product.price)}</TableCell>
               <TableCell>
-                {product.categories.map((cata) => (
-                  <p key={cata}>{cata}</p>
-                ))}
+                ${formatNumberWithPrecision(Number(product.price))}
+              </TableCell>
+              <TableCell>
+                {formatToTitleCase(product.category)}
               </TableCell>
               <TableCell>{product.quantity}</TableCell>
-              <TableCell>{product.average_rating}</TableCell>
+              <TableCell>{product.average_rating} stars</TableCell>
               <TableCell className="flex gap-1">
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/admin/products/${product._id}`}>Modify</Link>

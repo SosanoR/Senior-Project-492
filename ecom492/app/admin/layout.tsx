@@ -1,6 +1,6 @@
 
 import Footer from "@/components/footer/index";
-import Header from "../../components/admin-header";
+import Header from "../../components/admin/header";
 export default function RootLayout({
   children,
 }: Readonly<{

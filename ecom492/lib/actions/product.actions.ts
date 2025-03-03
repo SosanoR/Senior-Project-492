@@ -3,6 +3,7 @@
 import { ObjectId } from "mongodb";
 import {
   data,
+  insertionData,
   ProductCardProps,
   suggestionsProps,
   userProductData,
@@ -14,6 +15,14 @@ import { formatError } from "../utils";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { insertProductSchema, updateProductSchema } from "../validators";
+import cloudinary from "cloudinary";
+
+cloudinary.v2.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
 
 // Get latest Products
 export async function getLatest(limit: number) {
@@ -47,8 +56,6 @@ export async function getLatest(limit: number) {
 // Find single product
 export async function findProduct(id: string) {
   try {
-    // await client.connect();
-
     const collection = client.db("testDB").collection<data>("items");
     const product = await collection.findOne<data>(new ObjectId(id));
 
@@ -82,11 +89,20 @@ export async function getAutocompleteSuggestions(query: string) {
 }
 
 // Create a user product
-export async function createProduct(data: z.infer<typeof insertProductSchema>) {
+export async function createProduct(
+  data: z.infer<typeof insertProductSchema>,
+  session_id: string
+) {
   try {
     const product = insertProductSchema.parse(data);
-    const collection = client.db("testDB").collection<data>("items");
-    await collection.insertOne(product);
+
+    const collection = client.db("testDB").collection<insertionData>("items");
+    await collection.insertOne({
+      ...product,
+      average_rating: 0,
+      units_sold: 0,
+      user_id: session_id,
+    });
 
     revalidatePath("/admin/products");
     return { success: true, message: "Product created successfully." };
@@ -94,6 +110,16 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
     console.log(error);
     return { success: false, message: formatError(error) };
   }
+}
+
+// Remove Cloudinary image
+export async function removeImage(image: string) {
+  await cloudinary.v2.api
+    .delete_resources([image], {
+      type: "upload",
+      resource_type: "image",
+    })
+    .then(console.log);
 }
 
 // Update a user product
@@ -109,6 +135,10 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
       throw new Error("Product not found.");
     }
 
+    if (product._id !== productExists._id) {
+      throw new Error("Invalid user");
+    }
+
     await collection.updateOne(
       { _id: productExists._id },
       {
@@ -116,10 +146,11 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
           name: product.name,
           description: product.description,
           quantity: product.quantity,
-          price: Number(product.price),
+          price: product.price,
           brand: product.brand,
-          categories: product.categories,
+          category: product.category,
           images: product.images,
+          discount: product.discount,
         },
       }
     );
@@ -134,10 +165,10 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
 
 // Return user's products
 export async function getAllUserProducts({
-  query,
+  // query,
   limit = PAGE_SIZE,
   page,
-  categories,
+  // category,
   user_id,
 }: userProductQuery) {
   try {
@@ -156,7 +187,7 @@ export async function getAllUserProducts({
           _id: 1,
           name: 1,
           price: 1,
-          categories: 1,
+          category: 1,
           quantity: 1,
           average_rating: 1,
         },
@@ -199,6 +230,13 @@ export async function deleteUserProduct(id: string) {
     if (!product) {
       throw new Error("Product does not exist.");
     }
+
+    await cloudinary.v2.api
+      .delete_resources(product.images, {
+        type: "upload",
+        resource_type: "image",
+      })
+      .then(console.log);
 
     await collection.deleteOne({ _id: new ObjectId(id) });
     revalidatePath("/admin/products");

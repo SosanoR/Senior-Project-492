@@ -19,6 +19,7 @@ const ProductImage = ({ images, name, width, height }: ProductImageProps) => {
       crop="pad"
       gravity="center"
       removeBackground
+      sizes="(min-width: 320px) 100vw, (min-width: 640px) 50vw, (min-width: 768px) 33.3vw, 25vw"
     />
   );
 };

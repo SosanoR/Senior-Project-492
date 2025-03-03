@@ -28,13 +28,10 @@ export const PAGE_SIZE = 5;
 export const productDefaultVals = {
   name: "",
   description: "",
-  quantity: "0",
+  quantity: 0,
   price: "0",
-  rating: "0",
-  reviewers: "0",
-  brand: "0",
-  categories: [],
-  images: []
-
-  
-}
+  brand: "",
+  category: "",
+  images: [],
+  discount: 0,
+};
