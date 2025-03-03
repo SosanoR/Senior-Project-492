@@ -54,8 +54,11 @@ const AdminProductsPage = async (props: {
 
   if (!res) {
     return (
-      <div className="flex justify-center text-4xl font-bold items-center">
-        No Products Found
+      <div className="flex-between">
+        <h1 className="h2-bold">No Products Found</h1>
+        <Button variant="default" asChild>
+          <Link href="/admin/products/create">Create Product</Link>
+        </Button>
       </div>
     );
   }
@@ -64,7 +67,6 @@ const AdminProductsPage = async (props: {
     JSON.parse(res);
 
   if (page > (products?.totalPages || 1) || page < 1) {
-    console.log(page);
     return redirect("/admin/products");
   }
   return (
@@ -95,9 +97,7 @@ const AdminProductsPage = async (props: {
               <TableCell>
                 ${formatNumberWithPrecision(Number(product.price))}
               </TableCell>
-              <TableCell>
-                {formatToTitleCase(product.category)}
-              </TableCell>
+              <TableCell>{formatToTitleCase(product.category)}</TableCell>
               <TableCell>{product.quantity}</TableCell>
               <TableCell>{product.average_rating} stars</TableCell>
               <TableCell className="flex gap-1">
