@@ -5,12 +5,21 @@ import ProductPrice from "@/components/homepage/products/product-price";
 import { findProduct } from "@/lib/actions/product.actions";
 import { notFound } from "next/navigation";
 import ProductImages from "@/components/result-page/product-images";
+import { auth } from "@/auth";
+import { recordUserLastViewed } from "@/lib/actions/tracking.actions";
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ id: string }>;
 }) => {
   const { id } = await props.params;
   const product = await findProduct(id);
+  const session = await auth();
+
+  if (session) {
+    if (session.user?.id) {
+     await recordUserLastViewed(id, session.user.id)
+    }
+  }
 
   if (!product) {
     notFound();
@@ -27,11 +36,12 @@ const ProductDetailsPage = async (props: {
           {/* Details Col */}
           <div className="col-span-2 p-5">
             <div className="flex flex-col gap-6">
-              <p>Brand category</p>
+              <p className="text-lg">Brand: {product.brand}</p>
+              <p className="text-lg">Category: {product.category}</p>
               <h1 className="h3-bold">{product.name}</h1>
               {/* Ratings count. Note fix the count later */}
               <p>
-                {product.average_rating} stars from {product.units_sold}{" "}
+                {product.average_rating} stars from {product.reviewer_count}{" "}
                 reviewers
               </p>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">

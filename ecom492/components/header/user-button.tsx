@@ -34,7 +34,7 @@ const UserButton = async () => {
               variant="ghost"
               className="relative w-8 h-8 rounded-full ml-2 flex items-center justify-center bg-gray-200 text-black"
             >
-              {firstInitial}
+              {firstInitial.toUpperCase()}
             </Button>
           </div>
         </DropdownMenuTrigger>

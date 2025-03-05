@@ -70,13 +70,14 @@ const AdminProductsPage = async (props: {
     return redirect("/admin/products");
   }
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 flex flex-col">
       <div className="flex-between">
         <h1 className="h2-bold">Products</h1>
         <Button variant="default" asChild>
           <Link href="/admin/products/create">Create Product</Link>
         </Button>
       </div>
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -101,7 +102,12 @@ const AdminProductsPage = async (props: {
               <TableCell>{product.quantity}</TableCell>
               <TableCell>{product.average_rating} stars</TableCell>
               <TableCell className="flex gap-1">
-                <Button asChild variant="outline" size="sm">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="hover:bg-blue-500"
+                >
                   <Link href={`/admin/products/${product._id}`}>Modify</Link>
                 </Button>
 

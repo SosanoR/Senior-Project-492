@@ -11,7 +11,7 @@ const ProductList = ({ products, title }: ProductListProps) => {
     <div>
       <h2 className="h2-bold mb-4">{title}</h2>
       {products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-slideinup">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {products.map((product: ProductCardProps, key: React.Key) => (
             <ProductCard
               key={key}

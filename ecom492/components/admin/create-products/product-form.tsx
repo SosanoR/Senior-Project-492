@@ -23,11 +23,17 @@ import {
   createProduct,
   updateProduct,
   removeImage,
+  removeImages,
 } from "@/lib/actions/product.actions";
 import { Slide, toast } from "react-toastify";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { CldImage, CldUploadWidget, CloudinaryUploadWidgetInfo, CloudinaryUploadWidgetResults } from "next-cloudinary";
+import {
+  CldImage,
+  CldUploadWidget,
+  CloudinaryUploadWidgetInfo,
+  CloudinaryUploadWidgetResults,
+} from "next-cloudinary";
 
 interface productFormProps {
   type: "create" | "update";
@@ -76,7 +82,7 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
           theme: "colored",
           transition: Slide,
         });
-        router.push("/admin/products");
+        handleReset(false);
       }
     }
 
@@ -112,7 +118,6 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
           theme: "colored",
           transition: Slide,
         });
-        router.push("/admin/products");
       }
     }
   };
@@ -132,6 +137,14 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
 
     form.setValue("images", [...form.getValues().images, newImages.public_id]);
     setImages(form.getValues().images);
+  };
+
+  const handleReset = (deleteImages: boolean) => {
+    if (deleteImages) {
+      removeImages(form.getValues().images);
+    }
+    form.reset();
+    setImages([]);
   };
 
   return (
@@ -348,28 +361,32 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
                         ))}
                       </div>
                     )}
-                      <CldUploadWidget
-                        options={{
-                          sources: [
-                            "local",
-                            "camera",
-                            "dropbox",
-                            "google_drive",
-                            "url",
-                            "unsplash",
-                          ],
-                        }}
-                        signatureEndpoint="/api/sign-cloudinary-params"
-                        onSuccess={(e) => handleSuccess(e)}
-                      >
-                        {({ open }) => {
-                          return (
-                            <button className="bg-black text-white dark:bg-white dark:text-black font-normal rounded-sm px-6 py-2" type="button" onClick={() => open()}>
-                              Upload Images
-                            </button>
-                          );
-                        }}
-                      </CldUploadWidget>
+                    <CldUploadWidget
+                      options={{
+                        sources: [
+                          "local",
+                          "camera",
+                          "dropbox",
+                          "google_drive",
+                          "url",
+                          "unsplash",
+                        ],
+                      }}
+                      signatureEndpoint="/api/sign-cloudinary-params"
+                      onSuccess={(e) => handleSuccess(e)}
+                    >
+                      {({ open }) => {
+                        return (
+                          <button
+                            className="bg-black text-white dark:bg-white dark:text-black font-normal rounded-sm px-6 py-2"
+                            type="button"
+                            onClick={() => open()}
+                          >
+                            Upload Images
+                          </button>
+                        );
+                      }}
+                    </CldUploadWidget>
                   </CardContent>
                 </Card>
                 <FormMessage />
@@ -378,7 +395,19 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
           />
         </div>
 
-        <div>
+        <div className="flex flex-col justify-end gap-5 md:flex-row">
+          {type === "create" && (
+            <Button
+              type="reset"
+              size="lg"
+              variant="destructive"
+              className="hover:bg-red-600"
+              onClick={() => handleReset(true)}
+            >
+              Reset
+            </Button>
+          )}
+
           <Button
             type="submit"
             disabled={form.formState.isSubmitting}

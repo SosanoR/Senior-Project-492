@@ -6,6 +6,7 @@ import {
   insertionData,
   ProductCardProps,
   suggestionsProps,
+  user_data,
   userProductData,
   userProductQuery,
 } from "@/_common/types";
@@ -24,8 +25,8 @@ cloudinary.v2.config({
   secure: true,
 });
 
-// Get latest Products
-export async function getLatest(limit: number) {
+// Get Best Selling Products
+export async function getBestSelling(limit: number) {
   try {
     const collection = client.db("testDB").collection<data>("items");
 
@@ -47,6 +48,62 @@ export async function getLatest(limit: number) {
       .limit(limit)
       .toArray();
 
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Get latest Products
+export async function getLatestProducts(limit: number) {
+  try {
+    const collection = client.db("testDB").collection<data>("items");
+
+    const data = await collection
+      .find<ProductCardProps>(
+        {},
+        {
+          sort: { created_on: "desc" },
+          projection: {
+            _id: 1,
+            name: 1,
+            images: 1,
+            average_rating: 1,
+            price: 1,
+            quantity: 1,
+          },
+        }
+      )
+      .limit(limit)
+      .toArray();
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Get products last viewed by user
+export async function getLastViewedProducts(limit: number, user_id: string) {
+  try {
+    const userCollection = client.db("testDB").collection<user_data>("User");
+    const user = { _id: new ObjectId(user_id) };
+    const userExists = await userCollection.findOne(user);
+    if (!userExists) {
+      throw new Error("User not found.");
+    }
+
+    const ids = userExists.last_viewed.map((id) => {
+      return new ObjectId(id);
+    });
+
+    const itemCollection = client.db("testDB").collection<data>("items");
+
+    const data = await itemCollection
+      .find<ProductCardProps>({ _id: { $in: ids } })
+      .limit(limit)
+      .toArray();
+      
     return data;
   } catch (error) {
     console.log(error);
@@ -97,11 +154,21 @@ export async function createProduct(
     const product = insertProductSchema.parse(data);
 
     const collection = client.db("testDB").collection<insertionData>("items");
+    const initRating = Math.random();
+    const rating = Number(
+      (initRating >= 0.5 ? initRating * 5 : (initRating + 0.5) * 5).toFixed(1)
+    );
+    const sells = Number((Math.random() * 1000).toFixed(0));
+    const reviewers = Number((Math.random() * sells).toFixed(0));
+
     await collection.insertOne({
       ...product,
-      average_rating: 0,
-      units_sold: 0,
+      average_rating: rating,
+      reviewer_count: reviewers,
+      units_sold: sells,
       user_id: session_id,
+      created_on: new Date(),
+      last_modified: new Date(),
     });
 
     revalidatePath("/admin/products");
@@ -112,10 +179,26 @@ export async function createProduct(
   }
 }
 
-// Remove Cloudinary image
+// Remove single Cloudinary image
 export async function removeImage(image: string) {
+  if (!image || "") {
+    return;
+  }
   await cloudinary.v2.api
     .delete_resources([image], {
+      type: "upload",
+      resource_type: "image",
+    })
+    .then(console.log);
+}
+
+// Remove multiple Cloudinary images
+export async function removeImages(images: string[]) {
+  if (!images || images.length === 0) {
+    return;
+  }
+  await cloudinary.v2.api
+    .delete_resources(images, {
       type: "upload",
       resource_type: "image",
     })
@@ -172,7 +255,6 @@ export async function getAllUserProducts({
   user_id,
 }: userProductQuery) {
   try {
-    console.log(`user_id: ${user_id}`)
     const pipeline = [
       {
         $search: {
@@ -209,8 +291,6 @@ export async function getAllUserProducts({
         data: userProductData[];
       }>(pipeline)
       .toArray();
-
-    console.log(`items found: ${data[0].data.length}`);
 
     if (data[0].data.length > 0) {
       return JSON.stringify({

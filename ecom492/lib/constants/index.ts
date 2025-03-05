@@ -23,15 +23,17 @@ export const registrationDefaultValues = {
   confirmPassword: "",
 };
 
-export const PAGE_SIZE = 5;
+export const PAGE_SIZE = 10;
 
 export const productDefaultVals = {
   name: "",
   description: "",
   quantity: 0,
-  price: "0",
+  price: "",
   brand: "",
   category: "",
   images: [],
   discount: 0,
 };
+
+export const USER_PRODUCT_TRACKING_SIZE = 5;

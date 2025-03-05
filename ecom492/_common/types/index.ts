@@ -6,6 +6,7 @@ export type data = {
   description: string;
   quantity: number;
   average_rating: number;
+  reviewer_count: number;
   units_sold: number;
   user_id: string;
   discount: number;
@@ -13,6 +14,8 @@ export type data = {
   images: string[];
   category: string;
   brand: string;
+  created_on: Date;
+  last_modified: Date;
 };
 
 export type insertionData = {
@@ -20,6 +23,7 @@ export type insertionData = {
   description: string;
   quantity: number;
   average_rating: number;
+  reviewer_count: number;
   units_sold: number;
   user_id: string;
   discount: number;
@@ -27,10 +31,12 @@ export type insertionData = {
   images: string[];
   category: string;
   brand: string;
+  created_on: Date;
+  last_modified: Date;
 };
 
 export interface ProductCardProps {
-  _id: string;
+  _id: string | ObjectId;
   name: string;
   images: string[];
   average_rating: number;
@@ -39,15 +45,16 @@ export interface ProductCardProps {
 }
 
 export type user_data = {
-  _id: string;
+  _id: string | ObjectId;
   name: string;
   email: string;
   password: string;
   role: string;
+  last_viewed: string[];
 };
 
 export interface suggestionsProps {
-  _id: string;
+  _id: string | ObjectId;
   name: string;
 }
 
@@ -60,7 +67,7 @@ export interface userProductQuery {
 }
 
 export interface userProductData {
-  _id: string;
+  _id: string | ObjectId;
   name: string;
   price: string;
   category: string;
