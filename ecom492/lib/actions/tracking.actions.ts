@@ -10,22 +10,17 @@ export async function recordUserLastViewed(item_id: string, user_id: string) {
     const collection = client.db("testDB").collection<user_data>("User");
     const userData = await collection.findOne(new ObjectId(user_id));
     if (userData) {
-      console.log("user was found");
       let lastViewedPages = userData?.last_viewed;
 
       if (!lastViewedPages) {
-        console.log("created field");
         lastViewedPages = [item_id];
       } else if (!lastViewedPages.includes(item_id)) {
-        console.log("pushed new item");
         lastViewedPages.push(item_id);
 
-        if (lastViewedPages.length > USER_PRODUCT_TRACKING_SIZE) {
-          console.log("shifted");
+        while (lastViewedPages.length > USER_PRODUCT_TRACKING_SIZE) {
           lastViewedPages.shift();
         }
       } else if (lastViewedPages.includes(item_id)) {
-        console.log("moved to front");
         lastViewedPages = lastViewedPages.filter((id) => id !== item_id);
         lastViewedPages.push(item_id);
       } else {
@@ -38,7 +33,6 @@ export async function recordUserLastViewed(item_id: string, user_id: string) {
         },
       };
 
-      console.log("lastViewedPages: ", lastViewedPages);
       await collection.updateOne(filter, update);
     }
   } catch (error) {

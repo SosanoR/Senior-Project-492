@@ -8,8 +8,8 @@ interface ProductBlockProps {
 }
 
 const ProductBlock = ({ title, products }: ProductBlockProps) => {
-  const width = 100;
-  const height = 100;
+  const width = 150;
+  const height = 150;
   return (
     <div>
       <h2 className="h2-bold mb-4">{title}</h2>

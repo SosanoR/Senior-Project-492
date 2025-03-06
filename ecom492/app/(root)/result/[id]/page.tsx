@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import ProductImages from "@/components/result-page/product-images";
 import { auth } from "@/auth";
 import { recordUserLastViewed } from "@/lib/actions/tracking.actions";
+import DisplayStars from "@/components/shared/display-stars";
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ id: string }>;
@@ -17,7 +18,7 @@ const ProductDetailsPage = async (props: {
 
   if (session) {
     if (session.user?.id) {
-     await recordUserLastViewed(id, session.user.id)
+      await recordUserLastViewed(id, session.user.id);
     }
   }
 
@@ -40,10 +41,17 @@ const ProductDetailsPage = async (props: {
               <p className="text-lg">Category: {product.category}</p>
               <h1 className="h3-bold">{product.name}</h1>
               {/* Ratings count. Note fix the count later */}
-              <p>
-                {product.average_rating} stars from {product.reviewer_count}{" "}
-                reviewers
-              </p>
+              <div className="flex items-center gap-5">
+                <Button variant="outline" className="hover:cursor-default">
+                  {product.average_rating}
+                </Button>
+
+                <div className="flex gap-1">
+                  <DisplayStars rating={product.average_rating} />
+                </div>
+                <p className="text-lg">{`from ${product.reviewer_count} reviewers.`}</p>
+                
+              </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <ProductPrice
                   value={Number(product.price)}

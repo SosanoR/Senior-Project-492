@@ -4,6 +4,8 @@ import ProductPrice from "./product-price";
 import ProductImage from "./product-image";
 import { ProductCardProps } from "@/_common/types";
 import { formatToTitleCase } from "@/lib/utils";
+import DisplayStars from "@/components/shared/display-stars";
+import { Button } from "@/components/ui/button";
 
 const ProductCard = ({
   _id,
@@ -18,7 +20,7 @@ const ProductCard = ({
 
   return (
     <Card className="w-full max-w-sm">
-      <CardHeader className="p-0 items-center">
+      <CardHeader className="p-2 items-center">
         <Link href={`/result/${_id}`}>
           <ProductImage
             images={images}
@@ -34,7 +36,12 @@ const ProductCard = ({
           <h2 className="text-sm font-medium">{formatToTitleCase(name)}</h2>
         </Link>
         <div className="flex-between gap-4">
-          <p>{average_rating} stars</p>
+          <div className="flex gap-3 items-center">
+            <Button variant="outline">{average_rating.toFixed(1)}</Button>
+            <div className="flex gap-1">
+              <DisplayStars rating={average_rating} />
+            </div>
+          </div>
           {quantity > 0 ? (
             <ProductPrice value={Number(price)} />
           ) : (

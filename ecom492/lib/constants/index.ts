@@ -36,4 +36,6 @@ export const productDefaultVals = {
   discount: 0,
 };
 
-export const USER_PRODUCT_TRACKING_SIZE = 5;
+export const USER_PRODUCT_TRACKING_SIZE = 4;
+
+export const MAX_RATINGS = 5;

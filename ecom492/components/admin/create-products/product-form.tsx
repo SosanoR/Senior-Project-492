@@ -42,7 +42,7 @@ interface productFormProps {
 }
 
 const ProductForm = ({ type, product, id }: productFormProps) => {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>(product?.images || []);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof insertProductSchema>>({

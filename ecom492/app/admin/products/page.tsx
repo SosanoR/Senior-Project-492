@@ -92,8 +92,8 @@ const AdminProductsPage = async (props: {
         </TableHeader>
         <TableBody>
           {products?.data.map((product) => (
-            <TableRow key={product._id}>
-              <TableCell>{product._id}</TableCell>
+            <TableRow key={String(product._id)}>
+              <TableCell>{String(product._id)}</TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell>
                 ${formatNumberWithPrecision(Number(product.price))}
@@ -108,7 +108,7 @@ const AdminProductsPage = async (props: {
                   size="sm"
                   className="hover:bg-blue-500"
                 >
-                  <Link href={`/admin/products/${product._id}`}>Modify</Link>
+                  <Link href={`/admin/products/update/${product._id}`}>Modify</Link>
                 </Button>
 
                 <DeleteDialog

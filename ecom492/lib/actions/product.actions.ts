@@ -31,20 +31,8 @@ export async function getBestSelling(limit: number) {
     const collection = client.db("testDB").collection<data>("items");
 
     const data = await collection
-      .find<ProductCardProps>(
-        {},
-        {
-          sort: { units_sold: -1 },
-          projection: {
-            _id: 1,
-            name: 1,
-            images: 1,
-            average_rating: 1,
-            price: 1,
-            quantity: 1,
-          },
-        }
-      )
+      .find<ProductCardProps>({})
+      .sort({  average_rating: -1 })
       .limit(limit)
       .toArray();
 
@@ -103,18 +91,21 @@ export async function getLastViewedProducts(limit: number, user_id: string) {
       .find<ProductCardProps>({ _id: { $in: ids } })
       .limit(limit)
       .toArray();
-      
+
     return data;
   } catch (error) {
     console.log(error);
   }
 }
 
-// Find single product
+// Find single product by id
 export async function findProduct(id: string) {
   try {
     const collection = client.db("testDB").collection<data>("items");
-    const product = await collection.findOne<data>(new ObjectId(id));
+
+    const filter = {_id: new ObjectId(id)};
+
+    const product = await collection.findOne<data>(filter);
 
     return product;
   } catch (error) {
@@ -125,7 +116,8 @@ export async function findProduct(id: string) {
 // Return autocomplete suggestions
 export async function getAutocompleteSuggestions(query: string) {
   try {
-    if (query.length > 3 && query !== undefined) {
+    const MIN_QUERY_LENGTH = 2;
+    if (query.length > MIN_QUERY_LENGTH && query !== undefined) {
       const collection = client.db("testDB").collection<data>("items");
 
       const data = await collection
