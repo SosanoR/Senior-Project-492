@@ -16,6 +16,8 @@ const ProductImage = ({ images, name, width, height }: ProductImageProps) => {
       width={width}
       height={height}
       priority
+      quality="auto"
+      format="auto"
       crop="pad"
       gravity="center"
       removeBackground

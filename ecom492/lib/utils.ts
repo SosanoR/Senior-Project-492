@@ -39,3 +39,8 @@ export function formatError(error: any) {
     }
   }
 }
+
+// Convert MongoDB Document to plain object
+export function convertToPlainObject<T>(doc: T): T {
+  return JSON.parse(JSON.stringify(doc));
+}

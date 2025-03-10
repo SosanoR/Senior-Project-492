@@ -61,7 +61,7 @@ const ProductDetailsPage = async (props: {
             </div>
             <div className="mt-10">
               <p className="font-semibold">Description</p>
-              <p>{product.description}</p>
+              <div>{product.description}</div>
             </div>
           </div>
           {/* Action col */}

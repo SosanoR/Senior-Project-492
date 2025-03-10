@@ -41,7 +41,7 @@ const AdminProductsPage = async (props: {
   const category = searchParams.category || "";
 
   if (!session) {
-    return redirect("/login");
+    return redirect("/");
   }
 
   const res = await getAllUserProducts({

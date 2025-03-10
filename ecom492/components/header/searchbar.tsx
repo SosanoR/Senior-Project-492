@@ -62,7 +62,7 @@ const SearchBar = () => {
                     suggestions.map((item) => (
                       <CommandItem
                         key={item.name}
-                        onSelect={(text) => changeInputValue(text, item._id)}
+                        onSelect={(text) => changeInputValue(text, item._id.toString())}
                         className="hover:cursor-pointer"
                       >
                         {item.name}

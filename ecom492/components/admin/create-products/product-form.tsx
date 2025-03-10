@@ -44,6 +44,7 @@ interface productFormProps {
 const ProductForm = ({ type, product, id }: productFormProps) => {
   const [images, setImages] = useState<string[]>(product?.images || []);
   const router = useRouter();
+  const imagesToRemove: string[] = [];
 
   const form = useForm<z.infer<typeof insertProductSchema>>({
     resolver: zodResolver(
@@ -87,12 +88,12 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
     }
 
     if (type === "update") {
-      if (!product?._id) {
+      if (!product?._id || !id) {
         router.push("/admin/products");
         return;
       }
 
-      const res = await updateProduct({ ...values, _id: id });
+      const res = await updateProduct({ ...values, _id: product._id.toString() }, id);
 
       if (!res.success) {
         toast.error(res.message, {
@@ -106,6 +107,7 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
           theme: "colored",
           transition: Slide,
         });
+        removeImages(imagesToRemove);
       } else {
         toast.success(res.message, {
           position: "top-right",
@@ -122,11 +124,18 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
     }
   };
 
-  const handleImageRemoval = (image: string) => {
+  const handleImageRemoval = (image: string, type: string) => {
     const index = images.indexOf(image);
     const newImages = [...images];
     newImages.splice(index, 1);
-    removeImage(image);
+
+    if (type === "create") {
+      removeImage(image);
+    }
+    else if (type === "update") {
+      imagesToRemove.push(image);
+    }
+
     form.setValue("images", newImages);
 
     setImages(newImages);
@@ -341,10 +350,11 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
                           <div key={index}>
                             <div className="flex justify-end mb-2">
                               <Button
+                              type="button"
                                 variant="default"
                                 className="absolute rounded-full shadow hover:bg-red-500 hover:shadow-red-300"
                                 size="sm"
-                                onClick={() => handleImageRemoval(image)}
+                                onClick={() => handleImageRemoval(image, type)}                  
                               >
                                 X
                               </Button>

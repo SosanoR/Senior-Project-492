@@ -9,9 +9,12 @@ interface ProductListProps {
 const ProductList = ({ products, title }: ProductListProps) => {
   return (
     <div>
+      <div className="flex justify-start">
+
       <h2 className="h2-bold mb-4">{title}</h2>
+      </div>
       {products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 justify-items-center">
           {products.map((product: ProductCardProps, key: React.Key) => (
             <ProductCard
               key={key}

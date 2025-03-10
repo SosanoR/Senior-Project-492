@@ -12,6 +12,8 @@ const ProductImages = ({ images }: { images: string[] }) => {
         width={1000}
         height={1000}
         className="min-h-[300px]"
+        quality="auto"
+        format="auto"
         crop="pad"
         gravity="center"
         removeBackground
@@ -31,6 +33,8 @@ const ProductImages = ({ images }: { images: string[] }) => {
               alt="image"
               width={100}
               height={100}
+              quality="auto"
+              format="auto"
               crop="pad"
               gravity="center"
               removeBackground

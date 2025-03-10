@@ -11,7 +11,6 @@ const config = {
   pages: {
     signIn: "/login",
     error: "/login",
-    signOut: "/"
   },
   session: {
     strategy: "jwt",
@@ -42,7 +41,7 @@ const config = {
 
             if (verfied) {
               return {
-                id: user._id,
+                id: user._id.toString(),
                 name: user.name,
                 email: user.email,
                 role: user.role,

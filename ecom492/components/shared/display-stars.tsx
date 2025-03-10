@@ -6,6 +6,7 @@ const DisplayStars = ({ rating }: { rating: number }) => {
   for (let i = 1; i <= MAX_RATINGS; i++) {
     stars.push(
       <svg
+      key={i}
         className={`w-[1rem] h-[1.5rem] ${
           i <= rating ? "text-yellow-300" : "text-gray-300"
         }`}

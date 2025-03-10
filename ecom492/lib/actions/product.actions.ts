@@ -198,7 +198,7 @@ export async function removeImages(images: string[]) {
 }
 
 // Update a user product
-export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
+export async function updateProduct(data: z.infer<typeof updateProductSchema>, user_id: string) {
   try {
     const product = updateProductSchema.parse(data);
     const collection = client.db("testDB").collection<data>("items");
@@ -210,7 +210,7 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
       throw new Error("Product not found.");
     }
 
-    if (product._id !== productExists._id) {
+    if (product._id !== productExists._id.toString() || productExists.user_id !== user_id) {
       throw new Error("Invalid user");
     }
 
@@ -226,12 +226,13 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
           category: product.category,
           images: product.images,
           discount: product.discount,
+          last_modified: new Date(),
         },
       }
     );
 
     revalidatePath("/admin/products");
-    return { success: true, message: "Product created successfully." };
+    return { success: true, message: "Product updated successfully." };
   } catch (error) {
     console.log(error);
     return { success: false, message: formatError(error) };

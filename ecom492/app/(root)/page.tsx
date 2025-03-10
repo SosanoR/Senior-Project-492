@@ -30,7 +30,8 @@ export default async function Home() {
           products={bestSellingRes ? bestSellingRes : []}
           title="Best Selling"
         />
-        <div className="grid md:grid-cols-2 gap-4">
+
+        <div className="grid gap-4 xl:grid-cols-2">
           <ProductBlock
             title="Latest Arrivals"
             products={latestArrivalsRes ? latestArrivalsRes : []}
@@ -41,6 +42,7 @@ export default async function Home() {
             products={lastViewedProducts ? lastViewedProducts : []}
           />)}
         </div>
+
       </div>
     </>
   );
