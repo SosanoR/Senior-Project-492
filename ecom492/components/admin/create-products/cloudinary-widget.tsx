@@ -12,7 +12,7 @@ interface CloudinaryWidgetProps {
 const CloudinaryWidget = ({ imageHandler, currentImages }: CloudinaryWidgetProps) => {
     const handleSuccess = (e: CloudinaryUploadWidgetResults) => {
         const newImages = e.info as CloudinaryUploadWidgetInfo;
-        console.log(`currentImages: ${currentImages}, newImages: ${newImages.public_id}`);
+        
         imageHandler([...currentImages, newImages.public_id]);
     };
 

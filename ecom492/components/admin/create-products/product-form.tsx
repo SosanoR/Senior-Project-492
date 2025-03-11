@@ -160,9 +160,7 @@ const ProductForm = ({ type, product, id }: productFormProps) => {
     <Form {...form}>
       <form
         method="POST"
-        onSubmit={form.handleSubmit(onSubmit, (onErrors) => {
-          console.log(onErrors);
-        })}
+        onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8"
       >
         <div className="flex flex-col gap-5 md:flex-row">

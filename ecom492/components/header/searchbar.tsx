@@ -21,11 +21,10 @@ const SearchBar = () => {
 
     setTimer(
       setTimeout(async () => {
-        console.log(`query`, query);
+
         const res = await getAutocompleteSuggestions(query);
-        console.log(`res`, res);
+
         if (res) {
-          console.log("?");
           setSuggestions(res);
         }
       }, 300)
@@ -39,7 +38,7 @@ const SearchBar = () => {
 
   return (
     <>
-      <form className="w-full flex items-center justify-center space-x-2 grow">
+      <form className="flex items-center justify-center space-x-2 grow">
         <div className="flex justify-center">
           <div className="relative grid">
             <div className="flex w-full items-center">

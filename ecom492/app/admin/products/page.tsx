@@ -46,7 +46,7 @@ const AdminProductsPage = async (props: {
 
   const res = await getAllUserProducts({
     query: searchText,
-    // limit: 2,
+    limit: 4,
     page,
     category,
     user_id: session.user?.id,
