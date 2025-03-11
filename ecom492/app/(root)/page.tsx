@@ -14,6 +14,7 @@ export default async function Home() {
   const bestSellingRes = await getBestSelling(PRODUCT_DISPLAY_LIMIT);
   const latestArrivalsRes = await getLatestProducts(PRODUCT_DISPLAY_LIMIT);
   let lastViewedProducts: ProductCardProps[] | undefined = [];
+  
   if (session) {
     if (session.user?.id) {
       lastViewedProducts = await getLastViewedProducts(

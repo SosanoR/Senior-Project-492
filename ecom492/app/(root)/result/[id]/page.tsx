@@ -9,6 +9,7 @@ import { auth } from "@/auth";
 import { recordUserLastViewed } from "@/lib/actions/tracking.actions";
 import DisplayStars from "@/components/shared/display-stars";
 
+
 const ProductDetailsPage = async (props: {
   params: Promise<{ id: string }>;
 }) => {
