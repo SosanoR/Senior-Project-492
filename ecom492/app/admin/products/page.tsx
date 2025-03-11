@@ -84,7 +84,7 @@ const AdminProductsPage = async (props: {
             <TableHead>ID</TableHead>
             <TableHead>NAME</TableHead>
             <TableHead>PRICE</TableHead>
-            <TableHead>category</TableHead>
+            <TableHead>CATEGORIES</TableHead>
             <TableHead>QUANTITY</TableHead>
             <TableHead>RATING</TableHead>
             <TableHead className="w-[100px]">ACTIONS</TableHead>
