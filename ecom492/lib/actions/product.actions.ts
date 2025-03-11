@@ -11,8 +11,8 @@ import {
   userProductQuery,
 } from "@/_common/types";
 import client from "../db";
-import { PAGE_SIZE } from "../constants";
-import { formatError } from "../utils";
+import { AUTOCOMPLETE_SEARCH_LIMIT, PAGE_SIZE } from "../constants";
+import { convertToPlainObject, formatError } from "../utils";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { insertProductSchema, updateProductSchema } from "../validators";
@@ -32,7 +32,7 @@ export async function getBestSelling(limit: number) {
 
     const data = await collection
       .find<ProductCardProps>({})
-      .sort({  average_rating: -1 })
+      .sort({ average_rating: -1 })
       .limit(limit)
       .toArray();
 
@@ -103,7 +103,7 @@ export async function findProduct(id: string) {
   try {
     const collection = client.db("testDB").collection<data>("items");
 
-    const filter = {_id: new ObjectId(id)};
+    const filter = { _id: new ObjectId(id) };
 
     const product = await collection.findOne<data>(filter);
 
@@ -120,18 +120,65 @@ export async function getAutocompleteSuggestions(query: string) {
     if (query.length > MIN_QUERY_LENGTH && query !== undefined) {
       const collection = client.db("testDB").collection<data>("items");
 
+      const pipeline = [
+        {
+          $search: {
+            index: "autocomplete",
+            compound: {
+              should: [
+                {
+                  autocomplete: {
+                    query: query,
+                    path: "name",
+                    fuzzy: { maxEdits: 2, prefixLength: 2 },
+                  },
+                },
+                {
+                  autocomplete: {
+                    query: query,
+                    path: "brand",
+                    fuzzy: { maxEdits: 2, prefixLength: 2 },
+                  },
+                },
+                {
+                  autocomplete: {
+                    query: query,
+                    path: "category",
+                    fuzzy: { maxEdits: 2, prefixLength: 2 },
+                  },
+                },
+              ],
+            },
+          },
+        },
+        {
+          $limit: AUTOCOMPLETE_SEARCH_LIMIT,
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+          },
+        },
+      ];
+
+      // const data = await collection
+      //   .find<suggestionsProps>(
+      //     { name: { $regex: query, $options: "i" } },
+      //     {
+      //       projection: { name: 1 },
+      //     }
+      //   )
+      //   .limit(5)
+      //   .toArray();
+
       const data = await collection
-        .find<suggestionsProps>(
-          { name: { $regex: query, $options: "i" } },
-          {
-            projection: { name: 1 },
-          }
-        )
-        .limit(5)
+        .aggregate<suggestionsProps>(pipeline)
         .toArray();
-      return JSON.stringify(data);
+
+      return convertToPlainObject(data);
     }
-    return JSON.stringify([]);
+    return [];
   } catch (error) {
     console.log(error);
   }
@@ -198,7 +245,10 @@ export async function removeImages(images: string[]) {
 }
 
 // Update a user product
-export async function updateProduct(data: z.infer<typeof updateProductSchema>, user_id: string) {
+export async function updateProduct(
+  data: z.infer<typeof updateProductSchema>,
+  user_id: string
+) {
   try {
     const product = updateProductSchema.parse(data);
     const collection = client.db("testDB").collection<data>("items");
@@ -210,7 +260,10 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>, u
       throw new Error("Product not found.");
     }
 
-    if (product._id !== productExists._id.toString() || productExists.user_id !== user_id) {
+    if (
+      product._id !== productExists._id.toString() ||
+      productExists.user_id !== user_id
+    ) {
       throw new Error("Invalid user");
     }
 

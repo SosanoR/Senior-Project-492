@@ -38,4 +38,6 @@ export const productDefaultVals = {
 
 export const USER_PRODUCT_TRACKING_SIZE = 4;
 
+export const AUTOCOMPLETE_SEARCH_LIMIT = 5;
+
 export const MAX_RATINGS = 5;

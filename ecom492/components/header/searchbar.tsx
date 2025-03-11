@@ -2,77 +2,60 @@
 
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Command, CommandInput, CommandList, CommandItem } from "../ui/command";
+// import { Command, CommandInput, CommandList, CommandItem } from "../ui/command";
 import { getAutocompleteSuggestions } from "@/lib/actions/product.actions";
 import { suggestionsProps } from "@/_common/types";
 import { useRouter } from "next/navigation";
+import { Input } from "../ui/input";
 
 const SearchBar = () => {
-  const [suggestions, setSuggestions] = useState<suggestionsProps[]>();
-  const [displaySuggestions, setDisplaySuggestions] = useState(true);
+  const [suggestions, setSuggestions] = useState<suggestionsProps[]>([]);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>();
-  const [searchField, setSearchField] = useState<string>();
+
   const router = useRouter();
 
   const getSuggestions = async (query: string) => {
-    setSearchField(query);
     if (timer) {
       clearTimeout(timer);
     }
 
     setTimer(
       setTimeout(async () => {
+        console.log(`query`, query);
         const res = await getAutocompleteSuggestions(query);
+        console.log(`res`, res);
         if (res) {
-          const data: suggestionsProps[] = JSON.parse(res);
-          if (data.length > 0) {
-            setSuggestions(data);
-            setDisplaySuggestions(false);
-          } else {
-            setSuggestions([]);
-          }
+          console.log("?");
+          setSuggestions(res);
         }
       }, 300)
     );
   };
 
-  const changeInputValue = (text: string, id: string) => {
-    setSearchField(text);
-    setDisplaySuggestions(true);
+  const changeInputValue = (id: string) => {
+    setSuggestions([]);
     router.push(`/result/${id}`);
   };
 
   return (
     <>
-      <form>
-        <div className="flex">
-          <div className="relative">
-            <Command className="">
-              <CommandInput
-                placeholder="Search Here"
-                onValueChange={(text) => getSuggestions(text)}
-                value={searchField}
-              />
-              <div className="">
-                <CommandList
-                  className="absolute bg-black text-white dark:bg-white dark:text-black w-full rounded"
-                  hidden={displaySuggestions}
-                >
-                  {suggestions &&
-                    suggestions.map((item) => (
-                      <CommandItem
-                        key={item.name}
-                        onSelect={(text) => changeInputValue(text, item._id.toString())}
-                        className="hover:cursor-pointer"
-                      >
-                        {item.name}
-                      </CommandItem>
-                    ))}
-                </CommandList>
-              </div>
-            </Command>
+      <form className="w-full flex items-center justify-center space-x-2 grow">
+        <div className="flex justify-center">
+          <div className="relative grid">
+            <div className="flex w-full items-center">
+              <Input type="search" placeholder="Search here" onChange={(text) => getSuggestions(text.target.value)} />
+              {suggestions && (
+                <ul className="absolute top-[2.5rem] bg-black text-white dark:bg-white dark:text-black w-full rounded">
+                  {suggestions.map((item: suggestionsProps, index) => (
+                    <li key={index} onClick={() => changeInputValue(item._id.toString())} className="hover:cursor-pointer hover:bg-gray-200 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white p-2">
+                      {item.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
-          <Button>Search</Button>
+          <Button className="max-w-xs">Search</Button>
         </div>
       </form>
     </>
