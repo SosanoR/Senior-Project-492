@@ -31,22 +31,35 @@ const SearchBar = () => {
     );
   };
 
-  const changeInputValue = (id: string) => {
+  const changeInputValue = (name: string) => {
+    const inputfield = document.getElementById("website-searchbar") as HTMLInputElement;
+    inputfield.value = name;
     setSuggestions([]);
-    router.push(`/result/${id}`);
+    router.push(`/results?query=${name}`);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const input = form.querySelector("input[type='search']") as HTMLInputElement;
+    const query = input.value.trim();
+    if (query) {
+      router.push(`/results?${new URLSearchParams({ query }).toString()}`);
+    }
+    setSuggestions([]);
   };
 
   return (
     <>
-      <form className="flex items-center justify-center space-x-2 grow">
+      <form className="flex items-center justify-center space-x-2 grow" onSubmit={handleSubmit}>
         <div className="flex justify-center">
           <div className="relative grid">
             <div className="flex w-full items-center">
-              <Input type="search" placeholder="Search here" onChange={(text) => getSuggestions(text.target.value)} />
+              <Input id="website-searchbar" type="search" placeholder="Search here" onChange={(text) => getSuggestions(text.target.value)} />
               {suggestions && (
                 <ul className="absolute top-[2.5rem] bg-black text-white dark:bg-white dark:text-black w-full rounded">
                   {suggestions.map((item: suggestionsProps, index) => (
-                    <li key={index} onClick={() => changeInputValue(item._id.toString())} className="hover:cursor-pointer hover:bg-gray-200 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white p-2">
+                    <li key={index} onClick={() => changeInputValue(item.name)} className="hover:cursor-pointer hover:bg-gray-200 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white p-2">
                       {item.name}
                     </li>
                   ))}

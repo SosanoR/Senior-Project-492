@@ -11,6 +11,7 @@ import { registerUser } from "@/lib/actions/user.actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Slide, toast } from "react-toastify";
 import { useTheme } from "next-themes";
+import { Checkbox } from "../ui/checkbox";
 
 const RegistrationForm = () => {
   const theme = useTheme();
@@ -46,6 +47,23 @@ const RegistrationForm = () => {
     });
     router.push("/login");
   }
+
+  const handleCheckbox = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const checkbox = e.currentTarget as HTMLInputElement;
+    const passwordField = document.getElementById("password") as HTMLInputElement;
+    const confirmPasswordField = document.getElementById("confirmPassword") as HTMLInputElement;
+    
+    checkbox.checked = !checkbox.checked; 
+
+    if (checkbox.checked) {
+      passwordField.type = "text";
+      confirmPasswordField.type = "text";
+    } else {
+      passwordField.type = "password";
+      confirmPasswordField.type = "password";
+    }
+  }
+
 
   return (
     <>
@@ -98,6 +116,11 @@ const RegistrationForm = () => {
               autoComplete="confirmPassword"
               defaultValue={registrationDefaultValues.confirmPassword}
             />
+          </div>
+
+          <div className="flex justify-end items-center gap-2">
+            <Checkbox className="p-2" onClick={(e) => handleCheckbox(e)} />
+            Show Password
           </div>
 
           <div>

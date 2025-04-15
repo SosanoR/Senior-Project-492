@@ -5,6 +5,9 @@ import {
   data,
   insertionData,
   ProductCardProps,
+  productFilterQuery,
+  productQuery,
+  ProductResultsCardProps,
   suggestionsProps,
   user_data,
   userProductData,
@@ -162,16 +165,6 @@ export async function getAutocompleteSuggestions(query: string) {
         },
       ];
 
-      // const data = await collection
-      //   .find<suggestionsProps>(
-      //     { name: { $regex: query, $options: "i" } },
-      //     {
-      //       projection: { name: 1 },
-      //     }
-      //   )
-      //   .limit(5)
-      //   .toArray();
-
       const data = await collection
         .aggregate<suggestionsProps>(pipeline)
         .toArray();
@@ -181,6 +174,7 @@ export async function getAutocompleteSuggestions(query: string) {
     return [];
   } catch (error) {
     console.log(error);
+    return [];
   }
 }
 
@@ -294,21 +288,52 @@ export async function updateProduct(
 
 // Return user's products
 export async function getAllUserProducts({
-  // query,
+  query,
   limit = PAGE_SIZE,
   page,
-  // category,
   user_id,
 }: userProductQuery) {
   try {
-    const pipeline = [
-      {
+    const pipeline = [];
+
+    // Optional filters
+    if (query) {
+      pipeline.push({
         $search: {
-          index: "user-products-index",
-          text: {
-            path: "user_id",
-            query: user_id,
+          index: "itemsDB",
+          compound: {
+            should: [
+              {
+                text: {
+                  query: query,
+                  path: "name",
+                  fuzzy: { maxEdits: 2, prefixLength: 2 },
+                },
+              },
+              {
+                text: {
+                  query: query,
+                  path: "brand",
+                  fuzzy: { maxEdits: 2, prefixLength: 2 },
+                },
+              },
+              {
+                text: {
+                  query: query,
+                  path: "category",
+                  fuzzy: { maxEdits: 2, prefixLength: 2 },
+                },
+              },
+            ],
           },
+        },
+      });
+    }
+
+    const manditoryFilters = [
+      {
+        $match: {
+          user_id: user_id,
         },
       },
       {
@@ -329,6 +354,36 @@ export async function getAllUserProducts({
       },
     ];
 
+    // const pipeline1 = [
+    //   {
+    //     $search: {
+    //       index: "user-products-index",
+    //       text: {
+    //         path: "user_id",
+    //         query: user_id,
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 1,
+    //       name: 1,
+    //       price: 1,
+    //       category: 1,
+    //       quantity: 1,
+    //       average_rating: 1,
+    //     },
+    //   },
+    //   {
+    //     $facet: {
+    //       metadata: [{ $count: "totalCount" }],
+    //       data: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+    //     },
+    //   },
+    // ];
+
+    pipeline.push(...manditoryFilters);
+
     const collection = client.db("testDB").collection<data>("items");
 
     const data = await collection
@@ -345,6 +400,216 @@ export async function getAllUserProducts({
       });
     }
 
+    return undefined;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Get all search results
+export async function getAllSearchResults({
+  query,
+  limit,
+  page,
+  brand,
+  category,
+  min,
+  max,
+  sort,
+}: productFilterQuery) {
+  try {
+    const filteredPipeline = [];
+
+    const queryPipeline = {
+      $search: {
+        index: "itemsDB",
+        compound: {
+          should: [
+            {
+              text: {
+                query: query,
+                path: "name",
+                fuzzy: { maxEdits: 2, prefixLength: 2 },
+              },
+            },
+            {
+              text: {
+                query: query,
+                path: "brand",
+                fuzzy: { maxEdits: 2, prefixLength: 2 },
+              },
+            },
+            {
+              text: {
+                query: query,
+                path: "category",
+                fuzzy: { maxEdits: 2, prefixLength: 2 },
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    // console.log(`query`, query);
+    // console.log(`brand`, brand);
+    // console.log(`category`, category);
+    // console.log(`min`, min);
+    // console.log(`max`, max);
+    // console.log(`sort`, sort);
+
+    filteredPipeline.push(queryPipeline);
+
+    if (brand) {
+      filteredPipeline.push({
+        $match: {
+          brand: { $regex: brand, $options: "i" },
+        },
+      });
+    }
+
+    if (category) {
+      filteredPipeline.push({
+        $match: {
+          category: { $regex: category, $options: "i" },
+        },
+      });
+    }
+
+    if (min) {
+      filteredPipeline.push({
+        $match: {
+          price: { $gte: Number(min) },
+        },
+      });
+    }
+
+    if (max && (!min || (Number(min) <= Number(max)))) {
+      filteredPipeline.push({
+        $match: {
+          price: { $lte: Number(max) },
+        },
+      });
+    }
+
+    if (sort === "price-l-h" || sort === "price-h-l" || sort === "rating-l-h" || sort === "rating-h-l") {
+      if (sort === "price-l-h") {
+        filteredPipeline.push({ $sort: { price: 1, _id: 1 } });
+      }
+      else if (sort === "price-h-l") {
+        filteredPipeline.push({ $sort: { price: -1, _id: 1 } });
+      }
+      else if (sort === "rating-l-h") {
+        filteredPipeline.push({ $sort: { average_rating: 1, _id: 1 } });
+      }
+      else if (sort === "rating-h-l") {
+        filteredPipeline.push({ $sort: { average_rating: -1, _id: 1 } });
+      }
+    }
+
+    const manditoryFilters = [
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          price: 1,
+          category: 1,
+          brand: 1,
+          average_rating: 1,
+          images: 1,
+          quantity: 1,
+        },
+      },
+      {
+        $facet: {
+          metadata: [{ $count: "totalCount" }],
+          data: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+        },
+      },
+    ];
+
+    filteredPipeline.push(...manditoryFilters);
+
+    const collection = client.db("testDB").collection<data>("items");
+    // console.log(`filteredPipeline`, filteredPipeline);
+    const data = await collection
+      .aggregate<{
+        metadata: [{ totalCount: number }];
+        data: ProductResultsCardProps[];
+      }>(filteredPipeline)
+      .toArray();
+
+    if (data[0].data.length > 0) {
+      return JSON.stringify({
+        data: data[0].data,
+        totalPages: Math.ceil(data[0].metadata[0].totalCount / limit),
+      });
+    }
+
+    return undefined;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getProductFilters(query: string) {
+  try {
+    const filterPipeline = [];
+
+    const queryPipeline = {
+      $search: {
+        index: "itemsDB",
+        compound: {
+          should: [
+            {
+              text: {
+                query: query,
+                path: "name",
+                fuzzy: { maxEdits: 2, prefixLength: 2 },
+              },
+            },
+            {
+              text: {
+                query: query,
+                path: "brand",
+                fuzzy: { maxEdits: 2, prefixLength: 2 },
+              },
+            },
+            {
+              text: {
+                query: query,
+                path: "category",
+                fuzzy: { maxEdits: 2, prefixLength: 2 },
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    filterPipeline.push(queryPipeline);
+    const collection = client.db("testDB").collection<data>("items");
+
+    const data = await collection
+      .aggregate<ProductResultsCardProps>(filterPipeline)
+      .toArray();
+
+    const categories = new Set<string>();
+    const brands = new Set<string>();
+    for (const item of data) {
+      const itemCategories = item.category.split(/[-\s,]+/);
+      brands.add(item.brand);
+      for (const cata of itemCategories) {
+        categories.add(cata);
+      }
+    }
+
+    if (data.length > 0) {
+      return convertToPlainObject({
+        categories: Array.from(categories.values()),
+        brands: Array.from(brands.values()),
+      });
+    }
     return undefined;
   } catch (error) {
     console.log(error);

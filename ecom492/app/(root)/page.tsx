@@ -19,7 +19,7 @@ export default async function Home() {
     if (session.user?.id) {
       lastViewedProducts = await getLastViewedProducts(
         PRODUCT_DISPLAY_LIMIT,
-        session.user?.id
+        session.user.id
       );
     }
   }

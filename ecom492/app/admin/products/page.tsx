@@ -25,6 +25,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import DeleteDialog from "@/components/shared/delete-dialog";
+import ProductFilter from "../../../components/admin/products/UserProductFilter";
 
 const AdminProductsPage = async (props: {
   searchParams: Promise<{
@@ -38,31 +39,36 @@ const AdminProductsPage = async (props: {
   const session = await auth();
   const page = Number(searchParams.page) || 1;
   const searchText = searchParams.query || "";
-  const category = searchParams.category || "";
 
-  if (!session) {
+  if (!session || !session.user?.id) {
     return redirect("/");
   }
 
-  const res = await getAllUserProducts({
+  let res = await getAllUserProducts({
     query: searchText,
-    limit: 4,
+    limit: 5,
     page,
-    category,
     user_id: session.user?.id,
   });
 
-  if (!res) {
-    return (
-      <div className="flex-between">
-        <h1 className="h2-bold">No Products Found</h1>
-        <Button variant="default" asChild>
-          <Link href="/admin/products/create">Create Product</Link>
-        </Button>
-      </div>
-    );
-  }
+  // if (!res) {
+  //   return (
+  //     <div className="flex-between">
+  //       <h1 className="h2-bold">No Products Found</h1>
+  //       <div className="flex space-x-2">
+  //         <ProductFilter />
+  //         <Button variant="default" asChild>
+  //           <Link href="/admin/products/create">Create Product</Link>
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
+  if (!res) {
+    res = JSON.stringify({data: [], totalPages: 0});
+  }
+  
   const products: { data: userProductData[]; totalPages: number } =
     JSON.parse(res);
 
@@ -73,53 +79,69 @@ const AdminProductsPage = async (props: {
     <div className="space-y-2 flex flex-col">
       <div className="flex-between">
         <h1 className="h2-bold">Products</h1>
-        <Button variant="default" asChild>
-          <Link href="/admin/products/create">Create Product</Link>
-        </Button>
+        <div className="flex space-x-2">
+          <ProductFilter />
+          <Button variant="default" asChild>
+            <Link href="/admin/products/create">Create Product</Link>
+          </Button>
+        </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>NAME</TableHead>
-            <TableHead>PRICE</TableHead>
-            <TableHead>CATEGORIES</TableHead>
-            <TableHead>QUANTITY</TableHead>
-            <TableHead>RATING</TableHead>
-            <TableHead className="w-[100px]">ACTIONS</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {products?.data.map((product) => (
-            <TableRow key={String(product._id)}>
-              <TableCell>{String(product._id)}</TableCell>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>
-                ${formatNumberWithPrecision(Number(product.price))}
-              </TableCell>
-              <TableCell>{formatToTitleCase(product.category)}</TableCell>
-              <TableCell>{product.quantity}</TableCell>
-              <TableCell>{product.average_rating} stars</TableCell>
-              <TableCell className="flex gap-1">
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="hover:bg-blue-500"
-                >
-                  <Link href={`/admin/products/update/${product._id}`}>Modify</Link>
-                </Button>
+      {products?.data.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-[50vh]">
+          <h1 className="h2-bold">No Products Found</h1>
+          <p className="text-md text-gray-500 dark:text-gray-400">
+            You can create a product by clicking the button above.
+          </p>
+        </div>
+      )}
 
-                <DeleteDialog
-                  id={`${product._id}`}
-                  action={deleteUserProduct}
-                />
-              </TableCell>
+      {products?.data.length > 0 && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>NAME</TableHead>
+              <TableHead>PRICE</TableHead>
+              <TableHead>CATEGORIES</TableHead>
+              <TableHead>QUANTITY</TableHead>
+              <TableHead>RATING</TableHead>
+              <TableHead className="w-[100px]">ACTIONS</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {products?.data.map((product) => (
+              <TableRow key={String(product._id)}>
+                <TableCell>{String(product._id)}</TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>
+                  ${formatNumberWithPrecision(Number(product.price))}
+                </TableCell>
+                <TableCell>{formatToTitleCase(product.category)}</TableCell>
+                <TableCell>{product.quantity}</TableCell>
+                <TableCell>{product.average_rating} stars</TableCell>
+                <TableCell className="flex gap-1">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="hover:bg-blue-500"
+                  >
+                    <Link href={`/admin/products/update/${product._id}`}>
+                      Modify
+                    </Link>
+                  </Button>
+
+                  <DeleteDialog
+                    id={`${product._id}`}
+                    action={deleteUserProduct}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
 
       {products?.totalPages && products?.totalPages > 1 && (
         <Pagination>

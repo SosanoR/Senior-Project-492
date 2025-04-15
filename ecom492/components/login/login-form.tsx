@@ -9,6 +9,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { signInWithCredentials } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
+import { Checkbox } from "../ui/checkbox";
 
 const LoginForm = () => {
   const [data, action] = useActionState(signInWithCredentials, {
@@ -26,6 +27,18 @@ const LoginForm = () => {
         {pending ? "Signing in..." : "Login"}
       </Button>
     );
+  };
+
+  const handleCheckbox = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    const checkbox = e.currentTarget as HTMLInputElement;
+    const passwordField = document.getElementById(
+      "password"
+    ) as HTMLInputElement;
+    checkbox.checked = !checkbox.checked;
+
+    passwordField.type = checkbox.checked ? "text" : "password";
   };
 
   return (
@@ -54,6 +67,13 @@ const LoginForm = () => {
             autoComplete="password"
             defaultValue={signInDefaultValues.password}
           />
+        </div>
+
+        <div className="flex justify-end items-center gap-2">
+          <Checkbox id="showPassword" onClick={handleCheckbox} />
+          <Label htmlFor="showPassword" className="ml-2">
+            Show Password
+          </Label>
         </div>
 
         <div>

@@ -44,6 +44,11 @@ export interface ProductCardProps {
   quantity: number;
 }
 
+export interface ProductResultsCardProps extends ProductCardProps {
+  category: string;
+  brand: string;
+}
+
 export type user_data = {
   _id: string | ObjectId;
   name: string;
@@ -59,11 +64,25 @@ export interface suggestionsProps {
 }
 
 export interface userProductQuery {
-  query: string;
+  query?: string;
   limit?: number;
   page: number;
+  user_id: string;
+}
+
+export interface productQuery {
+  query: string;
+  limit: number;
+  page: number;
   category?: string;
-  user_id?: string;
+}
+
+export interface productFilterQuery extends productQuery {
+  brand?: string;
+  sort?: string;
+  rating?: string;
+  min?: string;
+  max?: string;
 }
 
 export interface userProductData {
@@ -71,6 +90,6 @@ export interface userProductData {
   name: string;
   price: string;
   category: string;
-  quantity: number;
+  quantity?: number;
   average_rating: number;
 }

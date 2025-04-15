@@ -53,7 +53,7 @@ const ProductDetailsPage = async (props: {
                 <p className="text-lg">{`from ${product.reviewer_count} reviewers.`}</p>
                 
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-center">
                 <ProductPrice
                   value={Number(product.price)}
                   className="w-24 rounded-full dark:bg-white dark:text-black bg-black text-white px-5 py-2"
