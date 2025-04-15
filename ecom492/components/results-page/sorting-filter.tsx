@@ -23,7 +23,7 @@ const SortingOptions = ({sortMethod}: SortingOptionsProps) => {
     router.push(`/results?${params}`);
   };
   return (
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex items-center justify-between gap-3 md:justify-end">
       <div className="flex justify-start text-2xl">
         <Label htmlFor="sort">Sort By</Label>
       </div>
