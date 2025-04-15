@@ -7,7 +7,7 @@ import {
 } from "@/lib/actions/product.actions";
 import { formatToTitleCase } from "@/lib/utils";
 import Link from "next/link";
-import TestPage from "../test/page";
+// import TestPage from "../test/page";
 
 import MinMaxFilter from "@/components/results-page/min-max-filters";
 import SortingOptions from "@/components/results-page/sorting-filter";
@@ -19,6 +19,14 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface SearchParamsProps {
   query: string;
@@ -27,14 +35,13 @@ interface SearchParamsProps {
   brand?: string;
   min?: string;
   max?: string;
-  page: string;
+  currentPage: string;
 }
 
 interface urlParams {
-  q?: string;
-  c?: string;
-  s?: string;
-  b?: string;
+  categoryFilter?: string;
+  sortingFilter?: string;
+  brandFilter?: string;
   floor?: string;
   ceil?: string;
   pg?: string;
@@ -43,31 +50,40 @@ interface urlParams {
 const ResultsPage = async (props: {
   searchParams: Promise<SearchParamsProps>;
 }) => {
-  const {
-    query = "",
-    category = "all",
-    sort = "default",
-    brand = "all",
-    min = "0",
-    max = "10000",
-    page = "1",
-  } = await props.searchParams;
+  const searchParams = await props.searchParams;
+  const query = searchParams.query || "";
+  const category = searchParams.category || "all";
+  const sort = searchParams.sort || "default";
+  const brand = searchParams.brand || "all";
+  const min = searchParams.min || "0";
+  const max = searchParams.max || "10000";
+  const currentPage = searchParams.currentPage || "1";
+  const page = Number(searchParams.currentPage) || 1;
 
-  const setURL = ({ c, s, b, floor, ceil, pg }: urlParams) => {
-    const params = { query, category, sort, brand, min, max, page };
-    if (c) params.category = c;
-    if (s) params.sort = s;
-    if (b) params.brand = b;
+  const setURL = ({ categoryFilter, sortingFilter, brandFilter, floor, ceil, pg }: urlParams) => {
+    const params = {
+      query,
+      category,
+      sort,
+      brand,
+      min,
+      max,
+      currentPage,
+    };
+
+    if (categoryFilter) params.category = categoryFilter;
+    if (sortingFilter) params.sort = sortingFilter;
+    if (brandFilter) params.brand = brandFilter;
     if (floor) params.min = floor;
     if (ceil) params.max = ceil;
-    if (pg) params.page = pg;
+    if (pg) params.currentPage = pg;
 
     return `/results?${new URLSearchParams(params).toString()}`;
   };
 
   let res = await getAllSearchResults({
     query: query,
-    page: page ? Number(page) : 1,
+    page: page ? page : 1,
     limit: PAGE_SIZE,
     category: category !== "all" ? category : undefined,
     brand: brand !== "all" ? brand : undefined,
@@ -91,7 +107,7 @@ const ResultsPage = async (props: {
   } = JSON.parse(res);
 
   return (
-    <div className="grid md:grid-cols-4 gap-4 p-4">
+    <div className="grid md:grid-cols-4 gap-4 p-4 h-full">
       {/* Filters Start */}
       <div className="hidden md:block space-y-4 border-r">
         <div>
@@ -99,7 +115,7 @@ const ResultsPage = async (props: {
             className="text-blue-500 underline text-xl"
             href={`/results?${new URLSearchParams({
               query: query,
-              page: "1",
+              currentPage: "1",
             })}`}
           >
             Clear Filters
@@ -112,7 +128,7 @@ const ResultsPage = async (props: {
               className={`${
                 (category === "all" || category === "") && "font-bold"
               }`}
-              href={setURL({ c: "all" })}
+              href={setURL({ categoryFilter: "all" })}
             >
               All
             </Link>
@@ -121,7 +137,7 @@ const ResultsPage = async (props: {
             <li key={item}>
               <Link
                 className={`${category === item && "font-bold"}`}
-                href={setURL({ c: item.toLowerCase() })}
+                href={setURL({ categoryFilter: item.toLowerCase() })}
               >
                 {formatToTitleCase(item)}
               </Link>
@@ -134,7 +150,7 @@ const ResultsPage = async (props: {
           <li>
             <Link
               className={`${(brand === "all" || brand === "") && "font-bold"}`}
-              href={setURL({ b: "all" })}
+              href={setURL({ brandFilter: "all" })}
             >
               All
             </Link>
@@ -143,7 +159,7 @@ const ResultsPage = async (props: {
             <li key={item}>
               <Link
                 className={`${brand === item.toLowerCase() && "font-bold"}`}
-                href={setURL({ b: item.toLowerCase() })}
+                href={setURL({ brandFilter: item.toLowerCase() })}
               >
                 {formatToTitleCase(item)}
               </Link>
@@ -159,7 +175,7 @@ const ResultsPage = async (props: {
           brand={brand}
           min={min}
           max={max}
-          page={page}
+          page={currentPage}
         />
       </div>
 
@@ -179,7 +195,7 @@ const ResultsPage = async (props: {
               </Button>
             </div>
           </div>
-          
+
           <SheetContent>
             <SheetTitle>Filters</SheetTitle>
             <div>
@@ -187,7 +203,7 @@ const ResultsPage = async (props: {
                 className="text-blue-500 underline text-xl"
                 href={`/results?${new URLSearchParams({
                   query: query,
-                  page: "1",
+                  currentPage: "1",
                 })}`}
               >
                 Clear Filters
@@ -200,7 +216,7 @@ const ResultsPage = async (props: {
                   className={`${
                     (category === "all" || category === "") && "font-bold"
                   }`}
-                  href={setURL({ c: "all" })}
+                  href={setURL({ categoryFilter: "all" })}
                 >
                   All
                 </Link>
@@ -209,7 +225,7 @@ const ResultsPage = async (props: {
                 <li key={item}>
                   <Link
                     className={`${category === item && "font-bold"}`}
-                    href={setURL({ c: item.toLowerCase() })}
+                    href={setURL({ categoryFilter: item.toLowerCase() })}
                   >
                     {formatToTitleCase(item)}
                   </Link>
@@ -224,7 +240,7 @@ const ResultsPage = async (props: {
                   className={`${
                     (brand === "all" || brand === "") && "font-bold"
                   }`}
-                  href={setURL({ b: "all" })}
+                  href={setURL({ brandFilter: "all" })}
                 >
                   All
                 </Link>
@@ -233,7 +249,7 @@ const ResultsPage = async (props: {
                 <li key={item}>
                   <Link
                     className={`${brand === item.toLowerCase() && "font-bold"}`}
-                    href={setURL({ b: item.toLowerCase() })}
+                    href={setURL({ brandFilter: item.toLowerCase() })}
                   >
                     {formatToTitleCase(item)}
                   </Link>
@@ -249,17 +265,17 @@ const ResultsPage = async (props: {
               brand={brand}
               min={min}
               max={max}
-              page={page}
+              page={currentPage}
             />
           </SheetContent>
         </Sheet>
       </div>
       {/* Filters End */}
 
-      <div className="space-y-4 md:col-span-3">
+      <div className="space-y-4 md:flex md:flex-col md:gap-4 md:col-span-3">
         <SortingOptions sortMethod={sort || "Default"} />
 
-        <div className="grid gap-2">
+        <div className="flex flex-col grow gap-2 ">
           {products?.data?.length === 0 && (
             <div className="flex flex-col items-center justify-center h-[50vh]">
               <h1 className="h2-bold">No Products Found</h1>
@@ -269,6 +285,7 @@ const ResultsPage = async (props: {
               </p>
             </div>
           )}
+
           {products?.data?.map((item) => (
             <Link key={item._id.toString()} href={`/result/${item._id}`}>
               <ResultCard
@@ -280,6 +297,53 @@ const ResultsPage = async (props: {
               />
             </Link>
           ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-center items-end mt-4">
+          {products?.totalPages && products?.totalPages > 1 && (
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href={setURL({ pg: `${page - 1}` })}
+                    className={
+                      page === 1 ? "pointer-events-none opacity-50" : ""
+                    }
+                  />
+                </PaginationItem>
+
+                {Array.from({ length: products.totalPages }, (_, index) => {
+                  return (
+                    <PaginationItem key={index + 1}>
+                      <PaginationLink
+                        href={setURL({ pg: `${index + 1}` })}
+                        isActive={page === index + 1}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+
+                <PaginationItem>
+                  <PaginationNext
+                    href={setURL({
+                      pg:
+                        page !== products.totalPages
+                          ? `${page + 1}`
+                          : `${products.totalPages}`,
+                    })}
+                    className={
+                      page === products.totalPages
+                        ? "pointer-events-none opacity-50"
+                        : ""
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
         </div>
       </div>
     </div>

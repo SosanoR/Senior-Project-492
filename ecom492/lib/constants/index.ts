@@ -23,7 +23,7 @@ export const registrationDefaultValues = {
   confirmPassword: "",
 };
 
-export const PAGE_SIZE = 10;
+export const PAGE_SIZE = 2;
 
 export const productDefaultVals = {
   name: "",
