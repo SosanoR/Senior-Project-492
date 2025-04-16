@@ -8,6 +8,8 @@ import ProductImages from "@/components/result-page/product-images";
 import { auth } from "@/auth";
 import { recordUserLastViewed } from "@/lib/actions/tracking.actions";
 import DisplayStars from "@/components/shared/display-stars";
+import ProductReviews from "@/components/result-page/product-reviews";
+import { getUserReview } from "@/lib/actions/review.actions";
 
 
 const ProductDetailsPage = async (props: {
@@ -16,11 +18,13 @@ const ProductDetailsPage = async (props: {
   const { id } = await props.params;
   const product = await findProduct(id);
   const session = await auth();
+  let userReview
 
   if (session) {
     if (session.user?.id) {
       await recordUserLastViewed(id, session.user.id);
     }
+    userReview = await getUserReview(id);
   }
 
   if (!product) {
@@ -90,6 +94,16 @@ const ProductDetailsPage = async (props: {
             </Card>
           </div>
         </div>
+      </section>
+      
+      <section className="mt-10">
+      <div className="text-2xl">Customer Reviews</div>
+      <ProductReviews
+        user_id={session?.user?.id || ""}
+        user_name={session?.user?.name || ""}
+        user_review={userReview}
+        product_id={product._id.toString()}
+      />
       </section>
     </>
   );

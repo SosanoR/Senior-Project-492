@@ -19,7 +19,7 @@ const SortingOptions = ({sortMethod}: SortingOptionsProps) => {
     const params = new URLSearchParams(window.location.search);
     console.log(`sorting by ${value}`);
     params.set("sort", value);
-    params.set("page", "1");
+    params.set("currentPage", "1");
     router.push(`/results?${params}`);
   };
   return (

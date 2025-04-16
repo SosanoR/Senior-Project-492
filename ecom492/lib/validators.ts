@@ -52,3 +52,25 @@ export const registerFormSchema = z
     message: "Passwords don't match.",
     path: ["confirmPassword"],
   });
+
+// Schema for user Reviews
+export const reviewFormSchemaInsert = z.object({
+  user_id: z.string().min(1, "User id is required."),
+  user_name: z.string().min(1, "User name is required."),
+  product_id: z.string().min(1, "Product id is required."),
+  text: z.string().min(10, "Comment must be at least 10 characters long."),
+  rating: z.coerce.number().int().min(1, "Cannot be less than 1").max(5, "Cannot be more than 5"),
+});
+
+export const reviewFormSchemaUpdate = reviewFormSchemaInsert.extend({
+  _id: z.string().min(1, "Id is required"),
+  created_on: z.coerce.date(),
+  last_modified: z.coerce.date(),
+});
+
+// Schema for updating reviews
+export type Review = z.infer<typeof reviewFormSchemaInsert> & {
+  _id?: string;
+  created_on?: Date;
+  last_modified?: Date;
+};

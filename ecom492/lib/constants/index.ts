@@ -23,6 +23,14 @@ export const registrationDefaultValues = {
   confirmPassword: "",
 };
 
+export const reviewDefaultValues = {
+  user_id: "",
+  user_name: "",
+  product_id: "",
+  text: "",
+  rating: 0,
+};
+
 export const PAGE_SIZE = 2;
 
 export const productDefaultVals = {

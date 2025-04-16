@@ -22,7 +22,7 @@ const MinMaxFilter = ({query, category, sort, brand, min, max, page}: SearchPara
     const newMin = e.target.value;
     const params = new URLSearchParams(window.location.search);
     params.set("min", newMin);
-    params.set("page", "1");
+    params.set("currentPage", "1");
     if (timer) {
       clearTimeout(timer);
     }

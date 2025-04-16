@@ -93,3 +93,23 @@ export interface userProductData {
   quantity?: number;
   average_rating: number;
 }
+
+export interface userReviews {
+  _id: string;
+  user_id: string;
+  user_name: string;
+  product_id: string;
+  text: string;
+  rating: number;
+  created_on: Date;
+  last_modified: Date;
+}
+
+export interface userProjectedReviews {
+  _id: string
+  user_id: string
+  user_name: string;
+  product_id: string
+  text: string;
+  rating: number;
+}
