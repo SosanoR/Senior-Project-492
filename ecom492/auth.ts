@@ -1,19 +1,20 @@
+
 import NextAuth from "next-auth";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import * as argon2 from "argon2";
 import client from "./lib/db";
 import { user_data } from "./_common/types";
-import type { NextAuthConfig } from "next-auth";
 import { ObjectId } from "mongodb";
-
+import { authConfig } from "./auth.config";
+import { cookies } from "next/headers";
 const config = {
   pages: {
     signIn: "/login",
     error: "/login",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 24 * 60 * 60,
   },
   adapter: MongoDBAdapter(client),
@@ -79,10 +80,34 @@ const config = {
             .collection("User")
             .updateOne(filter, updateName);
         }
+
+        if (trigger === "signIn") {
+          const cookie = await cookies();
+          const cart_id = cookie.get("cart_id")?.value;
+          if (cart_id) {
+            const cart = await client
+              .db("testDB")
+              .collection("Cart")
+              .findOne({ cart_id: cart_id });
+            
+              if (cart) {
+                console.log(`user: ${user.id}`);
+                console.log(`cart_id: ${cart._id}`);
+
+               const found = await client.db("testDB").collection("Cart").updateOne({cart_id: cart_id}, {$set: {user_id: user.id}});
+               if (found) {
+                console.log(`cart_id: ${cart_id} was updated with user_id: ${user.id}`);
+               } else {
+                console.log(`cart_id: ${cart_id} was not updated with user_id: ${user.id}`);
+               }
+              }
+          }
+        }
       }
       return token;
     },
+    ...authConfig.callbacks,
   },
-} satisfies NextAuthConfig;
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config);

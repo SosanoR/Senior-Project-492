@@ -74,3 +74,22 @@ export type Review = z.infer<typeof reviewFormSchemaInsert> & {
   created_on?: Date;
   last_modified?: Date;
 };
+
+// Schema for individual Cart items
+export const cartItemSchema = z.object({
+  product_id: z.string().min(1, "Product id is required."),
+  name: z.string().min(1, "Name is required."),
+  brand: z.string().min(1, "Brand is required."),
+  quantity: z.coerce.number().int().nonnegative("Quantity must be a positive number."),
+  image: z.string().min(1, "Image is required."),
+  price: z.coerce.number().nonnegative("Price must be a positive number."),
+  average_rating: z.coerce.number()
+});
+
+// Schema for Cart
+export const cartSchema = z.object({
+  user_id: z.string().optional().nullable(),
+  items: z.array(cartItemSchema).min(1, "Cart must have at least one item."),
+  total_price: z.coerce.number().nonnegative("Total price must be a positive number."),
+  cart_id: z.string().min(1, "Cart id is required."),
+});

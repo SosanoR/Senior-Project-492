@@ -7,6 +7,7 @@ import { reviewFormSchemaInsert } from "../validators";
 import { convertToPlainObject, formatError } from "../utils";
 import { auth } from "@/auth";
 import { userReviews, data } from "@/_common/types";
+import { revalidatePath } from "next/cache";
 
 export async function getReviews(product_id: string) {
   try {
@@ -25,7 +26,6 @@ export async function getReviews(product_id: string) {
 
 export async function getUserReview(product_id: string) {
   try {
-
     const session = await auth();
     if (!session || !session.user?.id) {
       throw new Error("User is not logged in");
@@ -38,7 +38,9 @@ export async function getUserReview(product_id: string) {
       .collection<userReviews>("Review")
       .findOne<userReviews>({ user_id, product_id });
 
-
+    if (reviews === null) {
+      return undefined;
+    }
     return convertToPlainObject(reviews);
   } catch (error) {
     console.error("Error fetching user reviews:", error);
@@ -133,6 +135,9 @@ export async function createOrModifyReview(
           },
         }
       );
+
+    console.log(`product ${review.product_id} updated`);
+    revalidatePath(`/result/${review.product_id}`);
 
     return { success: true, message: `Review ${type} successfully.` };
   } catch (error) {

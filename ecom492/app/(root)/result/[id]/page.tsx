@@ -10,7 +10,8 @@ import { recordUserLastViewed } from "@/lib/actions/tracking.actions";
 import DisplayStars from "@/components/shared/display-stars";
 import ProductReviews from "@/components/result-page/product-reviews";
 import { getUserReview } from "@/lib/actions/review.actions";
-
+import CartAddButton from "@/components/result-page/product-add-cart";
+import { findCart } from "@/lib/actions/cart.actions";
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ id: string }>;
@@ -18,7 +19,7 @@ const ProductDetailsPage = async (props: {
   const { id } = await props.params;
   const product = await findProduct(id);
   const session = await auth();
-  let userReview
+  let userReview;
 
   if (session) {
     if (session.user?.id) {
@@ -26,6 +27,8 @@ const ProductDetailsPage = async (props: {
     }
     userReview = await getUserReview(id);
   }
+
+  const cart = await findCart();
 
   if (!product) {
     notFound();
@@ -45,7 +48,7 @@ const ProductDetailsPage = async (props: {
               <p className="text-lg">Brand: {product.brand}</p>
               <p className="text-lg">Category: {product.category}</p>
               <h1 className="h3-bold">{product.name}</h1>
-              {/* Ratings count. Note fix the count later */}
+              {/* Ratings count.*/}
               <div className="flex items-center gap-5">
                 <Button variant="outline" className="hover:cursor-default">
                   {product.average_rating}
@@ -55,7 +58,6 @@ const ProductDetailsPage = async (props: {
                   <DisplayStars rating={product.average_rating} />
                 </div>
                 <p className="text-lg">{`from ${product.reviewer_count} reviewers.`}</p>
-                
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-center">
                 <ProductPrice
@@ -87,7 +89,18 @@ const ProductDetailsPage = async (props: {
                 </div>
                 {product.quantity > 0 && (
                   <div className="flex-center">
-                    <Button className="w-full">Add to Cart</Button>
+                    <CartAddButton
+                      cart={cart}
+                      product={{
+                        product_id: product._id.toString(),
+                        name: product.name,
+                        brand: product.brand,
+                        price: product.price,
+                        quantity: product.quantity,
+                        image: product.images[0],
+                        average_rating: product.average_rating,
+                      }}
+                    />
                   </div>
                 )}
               </CardContent>
@@ -95,15 +108,15 @@ const ProductDetailsPage = async (props: {
           </div>
         </div>
       </section>
-      
+
       <section className="mt-10">
-      <div className="text-2xl">Customer Reviews</div>
-      <ProductReviews
-        user_id={session?.user?.id || ""}
-        user_name={session?.user?.name || ""}
-        user_review={userReview}
-        product_id={product._id.toString()}
-      />
+        <div className="text-2xl">Customer Reviews</div>
+        <ProductReviews
+          user_id={session?.user?.id || ""}
+          user_name={session?.user?.name || ""}
+          user_review={userReview}
+          product_id={product._id.toString()}
+        />
       </section>
     </>
   );

@@ -41,6 +41,15 @@ export function formatError(error: any) {
 }
 
 // Convert MongoDB Document to plain object
-export function convertToPlainObject<T>(doc: T): T {
-  return JSON.parse(JSON.stringify(doc));
+export function convertToPlainObject<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+interface item {
+  price: number;
+  quantity: number;
+}
+
+export function calcPrice<T extends item>(arr: T[]): {total_price: number} {
+  return {total_price: (arr.reduce((acc: number, item: T) => acc + item.price * item.quantity, 0)).toFixed(2)};
 }

@@ -10,7 +10,7 @@ export type data = {
   units_sold: number;
   user_id: string;
   discount: number;
-  price: string;
+  price: number;
   images: string[];
   category: string;
   brand: string;
@@ -27,7 +27,7 @@ export type insertionData = {
   units_sold: number;
   user_id: string;
   discount: number;
-  price: string;
+  price: number;
   images: string[];
   category: string;
   brand: string;
@@ -40,7 +40,7 @@ export interface ProductCardProps {
   name: string;
   images: string[];
   average_rating: number;
-  price: string;
+  price: number;
   quantity: number;
 }
 
@@ -88,7 +88,7 @@ export interface productFilterQuery extends productQuery {
 export interface userProductData {
   _id: string | ObjectId;
   name: string;
-  price: string;
+  price: number;
   category: string;
   quantity?: number;
   average_rating: number;
@@ -112,4 +112,27 @@ export interface userProjectedReviews {
   product_id: string
   text: string;
   rating: number;
+}
+
+export interface cartItem {
+  _id?: string | ObjectId;
+  product_id: string;
+  name: string;
+  brand: string;
+  price: number;
+  quantity: number;
+  image: string;
+  average_rating: number;
+  cart_id?: string;
+  createdAt?: Date;
+}
+
+export interface cart {
+  _id: string | ObjectId;
+  user_id?: string | null | ObjectId;
+  items: cartItem[];
+  total_price: number;
+  cart_id: string;
+  created_on?: Date;
+  last_modified?: Date;
 }

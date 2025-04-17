@@ -294,6 +294,8 @@ const ResultsPage = async (props: {
                 brand={item.brand}
                 price={item.price}
                 average_rating={item.average_rating}
+                height={250}
+                width={250}
               />
             </Link>
           ))}

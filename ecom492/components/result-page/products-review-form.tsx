@@ -26,6 +26,7 @@ import { createOrModifyReview } from "@/lib/actions/review.actions";
 import { Slide, toast } from "react-toastify";
 import { userReviews } from "@/_common/types";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface ReviewFormProps {
   user_id: string;
@@ -40,8 +41,7 @@ const ReviewForm = ({
   user_name,
   user_review,
 }: ReviewFormProps) => {
-
-  
+  const router = useRouter();
   const form = useForm<z.infer<typeof reviewFormSchemaInsert>>({
     resolver: zodResolver(user_review ? reviewFormSchemaUpdate : reviewFormSchemaInsert),
     defaultValues: user_review ? user_review : reviewDefaultValues,
