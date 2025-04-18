@@ -4,7 +4,6 @@ import ResultCard from "@/components/results-page/result-card";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -70,7 +69,7 @@ const CartPage = async () => {
                           hidden={true}
                         />
                         <div className="flex items-center justify-center">
-                          <CartQuantity quantity={item.quantity}/>
+                          <CartQuantity quantity={item.quantity} user_cart={cart} product_id={item.product_id}/>
                         </div>
                       </div>
                     ))}

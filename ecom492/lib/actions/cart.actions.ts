@@ -146,6 +146,83 @@ export async function removeFromCart(product_id: string, quantity = 1, remove_al
     }
 }
 
+export async function editCartItemQuantity(product_id: string, quantity: number, user_cart: cart) {
+  try {
+    const cart_id = (await cookies()).get("cart_id")?.value;
+    if (!cart_id) {
+      throw new Error("Cart ID not found in cookies.");
+    }
+
+    if (cart_id !== user_cart.cart_id) {
+      throw new Error("Cart ID does not match the user's cart.");
+    }
+
+
+    const cart = await findCart();
+    if (!cart) {
+      throw new Error("Cart not found.");
+    }
+
+    const found_item = cart.items.find((prod) => prod.product_id === product_id);
+    if (!found_item) {
+      throw new Error("Product not found in cart.");
+    }
+
+    if (quantity < 0) {
+      throw new Error("Quantity must be greater than or equal to 0.");
+    }
+
+    found_item.quantity = quantity;
+
+    const product = await client
+      .db("testDB")
+      .collection<data>("items")
+      .findOne({
+        _id: new ObjectId(found_item.product_id),
+      });
+
+    if (!product) {
+      throw new Error("Product not found.");
+    }
+
+    if (product.quantity < quantity) {
+      throw new Error("Not enough product in stock.");
+    }
+
+    if (product.quantity < found_item.quantity) {
+      throw new Error("Not enough product in stock.");
+    }
+
+    if((found_item.quantity === 0)) {
+      cart.items = cart.items.filter((prod) => prod.product_id !== found_item.product_id);
+  } 
+
+    await client
+      .db("testDB")
+      .collection<cart>("Cart")
+      .updateOne(
+        { _id: new ObjectId(cart._id) },
+        {
+          $set: {
+            items: cart.items,
+            total_price: calcPrice(cart.items).total_price,
+          },
+        }
+      );
+      revalidatePath(`/cart`);
+
+    return {
+      success: true,
+      message: `${found_item.name} quantity updated to ${quantity}.`,
+    };
+    
+  } catch (error) {
+    console.error("Error editing cart item quantity:", error);
+    throw new Error("Failed to edit cart item quantity.");
+    
+  }
+}
+
 export async function findCart() {
   try {
     const session = await auth();
