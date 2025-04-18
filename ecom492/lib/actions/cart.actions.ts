@@ -156,17 +156,12 @@ export async function findCart() {
     if (!cart_id) {
       throw new Error("Cart ID not found in cookies.");
     }
-    console.log(`user_id: ${user_id}`);
+
     if (user_id) {
       cart = await client
         .db("testDB")
         .collection<cart>("Cart")
-        .findOne<cart>({ user_id: new ObjectId(user_id) });
-        if (cart) {
-          console.log(`found cart_id: ${cart.cart_id}`);
-        } else {
-          console.log(`no cart found for user_id: ${user_id}`);
-        }
+        .findOne<cart>({ user_id: user_id });
     } else {
       cart = await client
         .db("testDB")

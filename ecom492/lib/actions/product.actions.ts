@@ -451,13 +451,6 @@ export async function getAllSearchResults({
       },
     };
 
-    // console.log(`query`, query);
-    // console.log(`brand`, brand);
-    // console.log(`category`, category);
-    // console.log(`min`, min);
-    // console.log(`max`, max);
-    // console.log(`sort`, sort);
-
     filteredPipeline.push(queryPipeline);
 
     if (brand) {

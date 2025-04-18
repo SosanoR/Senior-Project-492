@@ -2,11 +2,18 @@
 import { SquareMinus, SquarePlus } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-const CartQuantity = () => {
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(e.currentTarget.nodeValue);
-  };
+
+interface CartQuantityProps {
+  quantity: number;
+}
+
+const CartQuantity = ({quantity}: CartQuantityProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    console.log(value);
+
+  }
+
   return (
     <>
       <Button variant="default" className="">
@@ -16,7 +23,8 @@ const CartQuantity = () => {
         size={10}
         type="number"
         className="text-center"
-        onSubmit={handleSubmit}
+        onChange={(e) => handleChange(e)}
+        value={quantity || 1}
       />
       <Button variant="destructive" className="">
         <SquareMinus />

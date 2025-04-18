@@ -91,15 +91,8 @@ const config = {
               .findOne({ cart_id: cart_id });
             
               if (cart) {
-                console.log(`user: ${user.id}`);
-                console.log(`cart_id: ${cart._id}`);
 
                const found = await client.db("testDB").collection("Cart").updateOne({cart_id: cart_id}, {$set: {user_id: user.id}});
-               if (found) {
-                console.log(`cart_id: ${cart_id} was updated with user_id: ${user.id}`);
-               } else {
-                console.log(`cart_id: ${cart_id} was not updated with user_id: ${user.id}`);
-               }
               }
           }
         }

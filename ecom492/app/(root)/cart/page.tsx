@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
@@ -12,29 +13,45 @@ import { findCart } from "@/lib/actions/cart.actions";
 
 const CartPage = async () => {
   const cart = await findCart();
-  console.log(cart);
-  console.log("cart items", cart?.items);
 
   return (
     <div>
       {(!cart || cart.items.length === 0) && (
-        <div className="flex flex-col items-center h-screen">
+        <div className="flex flex-col items-center h-full w-full">
           <h1 className="text-2xl font-bold">Your cart is empty</h1>
           <p className="text-lg">Start shopping now!</p>
         </div>
       )}
       {cart && cart.items.length > 0 && (
-        <div className="flex items-start h-screen">
-          <div>
+        <div className="flex items-start h-full w-full">
+          <div className="flex">
             <h1 className="text-2xl font-bold">Your cart</h1>
-            <div className="flex w-full max-w-4xl p-4">
-              <Card>
+            <div className="flex w-full max-w-4xl p-4 items-center content-center gap-4">
+              
+              <div className="">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl font-bold text-center">
+                      Cart Summary
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <p className="text-lg">
+                        Total Items: {cart.items.length}
+                      </p>
+                      <p className="text-lg">
+                        Total Price: ${cart.total_price}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="col-span-5 w-full max-w-4xl p-4">
                 <CardTitle className="text-2xl font-bold text-center">
                   Cart Items
                 </CardTitle>
-                <CardDescription className="text-lg text-center">
-                  You have {cart.items.length} items in your cart.
-                </CardDescription>
                 <CardContent>
                   <div className="grid md:grid-cols-2  gap-4">
                     {cart.items.map((item) => (
@@ -53,7 +70,7 @@ const CartPage = async () => {
                           hidden={true}
                         />
                         <div className="flex items-center justify-center">
-                          <CartQuantity />
+                          <CartQuantity quantity={item.quantity}/>
                         </div>
                       </div>
                     ))}
@@ -62,7 +79,6 @@ const CartPage = async () => {
               </Card>
             </div>
           </div>
-          
         </div>
       )}
     </div>
