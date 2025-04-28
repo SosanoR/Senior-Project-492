@@ -5,13 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { registrationDefaultValues } from "@/lib/constants";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { registerUser } from "@/lib/actions/user.actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Slide, toast } from "react-toastify";
 import { useTheme } from "next-themes";
 import { Checkbox } from "../ui/checkbox";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 const RegistrationForm = () => {
   const theme = useTheme();
@@ -20,7 +21,7 @@ const RegistrationForm = () => {
     success: false,
     message: "",
   });
-
+  const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
@@ -48,21 +49,14 @@ const RegistrationForm = () => {
     router.push("/login");
   }
 
-  const handleCheckbox = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    const checkbox = e.currentTarget as HTMLInputElement;
-    const passwordField = document.getElementById("password") as HTMLInputElement;
-    const confirmPasswordField = document.getElementById("confirmPassword") as HTMLInputElement;
-    
-    checkbox.checked = !checkbox.checked; 
-
-    if (checkbox.checked) {
-      passwordField.type = "text";
-      confirmPasswordField.type = "text";
-    } else {
-      passwordField.type = "password";
-      confirmPasswordField.type = "password";
+  const handleCheckbox = (
+    e: CheckedState
+  ) => {
+    const checkbox = e.valueOf() ;
+    if (typeof checkbox === "boolean") {
+      setShowPassword(checkbox);
     }
-  }
+  };
 
 
   return (
@@ -99,7 +93,7 @@ const RegistrationForm = () => {
             <Input
               id="password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               autoComplete="password"
               defaultValue={registrationDefaultValues.password}
@@ -111,7 +105,7 @@ const RegistrationForm = () => {
             <Input
               id="confirmPassword"
               name="confirmPassword"
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               autoComplete="confirmPassword"
               defaultValue={registrationDefaultValues.confirmPassword}
@@ -119,7 +113,7 @@ const RegistrationForm = () => {
           </div>
 
           <div className="flex justify-end items-center gap-2">
-            <Checkbox className="p-2" onClick={(e) => handleCheckbox(e)} />
+            <Checkbox className="p-2" onCheckedChange={(e) => handleCheckbox(e)} />
             Show Password
           </div>
 

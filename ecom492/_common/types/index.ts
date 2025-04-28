@@ -41,6 +41,7 @@ export interface ProductCardProps {
   images: string[];
   average_rating: number;
   price: number;
+  discount?: number;
   quantity: number;
 }
 
@@ -120,6 +121,7 @@ export interface cartItem {
   name: string;
   brand: string;
   price: number;
+  discount: number;
   quantity: number;
   image: string;
   average_rating: number;
@@ -133,6 +135,7 @@ export interface cart {
   items: cartItem[];
   total_price: number;
   cart_id: string;
+  status: string;
   created_on?: Date;
   last_modified?: Date;
 }

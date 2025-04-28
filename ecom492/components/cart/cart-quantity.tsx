@@ -5,6 +5,7 @@ import { Input } from "../ui/input";
 import { useState, useTransition } from "react";
 import { cart } from "@/_common/types";
 import { editCartItemQuantity } from "@/lib/actions/cart.actions";
+import { Slide, toast } from "react-toastify";
 
 interface CartQuantityProps {
   quantity: number;
@@ -18,7 +19,7 @@ const CartQuantity = ({
   user_cart,
 }: CartQuantityProps) => {
   const [val, setVal] = useState<number>(quantity || 1);
-  const [updating, setUpdating] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   return (
     <>
@@ -26,14 +27,28 @@ const CartQuantity = ({
         variant="default"
         className=""
         onClick={() =>
-          setUpdating(async () => {
+          startTransition(async () => {
             if (user_cart) {
-              await editCartItemQuantity(product_id, val + 1, user_cart);
+              const res = await editCartItemQuantity(product_id, val + 1, user_cart);
+              if (!res.success) {
+                toast.error(res.message, {
+                  position: "top-right",
+                  autoClose: 2500,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "colored",
+                  transition: Slide,
+                  });
+                  return;
+              }
             }
             setVal((prev) => prev + 1);
           })
         }
-        disabled={updating}
+        disabled={isPending}
       >
         <SquarePlus />
       </Button>
@@ -49,14 +64,14 @@ const CartQuantity = ({
         variant="destructive"
         className=""
         onClick={() => {
-          setUpdating(async () => {
+          startTransition(async () => {
             if (user_cart) {
               await editCartItemQuantity(product_id, val - 1, user_cart);
             }
             setVal((prev) => prev - 1);
           });
         }}
-        disabled={updating}
+        disabled={isPending}
       >
         <SquareMinus />
       </Button>

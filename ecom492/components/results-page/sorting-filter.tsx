@@ -17,13 +17,13 @@ const SortingOptions = ({sortMethod}: SortingOptionsProps) => {
   const router = useRouter();
   const handleSortChange = (value: string) => {
     const params = new URLSearchParams(window.location.search);
-    console.log(`sorting by ${value}`);
     params.set("sort", value);
     params.set("currentPage", "1");
     router.push(`/results?${params}`);
   };
   return (
     <div className="flex items-center justify-between gap-3 md:justify-end">
+
       <div className="flex justify-start text-2xl">
         <Label htmlFor="sort">Sort By</Label>
       </div>

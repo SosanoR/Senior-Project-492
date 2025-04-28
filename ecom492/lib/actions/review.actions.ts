@@ -8,16 +8,41 @@ import { convertToPlainObject, formatError } from "../utils";
 import { auth } from "@/auth";
 import { userReviews, data } from "@/_common/types";
 import { revalidatePath } from "next/cache";
+import { PAGE_SIZE } from "../constants";
 
-export async function getReviews(product_id: string) {
+export async function getReviews(product_id: string, page: number = 1) {
   try {
+
+    console.log("page:", page);
+    const pipeline = [
+      {
+        $match: { product_id },
+      },
+      {
+        $facet: {
+          metadata: [{ $count: "totalCount" }],
+          data: [{ $skip: (page - 1) * PAGE_SIZE }, { $limit: PAGE_SIZE }],
+        },
+      },
+    ];
+
+    // const reviews = await client
+    //   .db("testDB")
+    //   .collection<userReviews>("Review")
+    //   .find<userReviews>({ product_id })
+    //   .toArray();
+
     const reviews = await client
       .db("testDB")
       .collection<userReviews>("Review")
-      .find<userReviews>({ product_id })
+      .aggregate<{metadata: [{totalCount: number}], data: userReviews[]}>(pipeline)
       .toArray();
 
-    return convertToPlainObject(reviews);
+    return convertToPlainObject({
+      data: reviews[0]?.data,
+      totalPages:
+        Math.ceil(reviews[0]?.metadata[0]?.totalCount / PAGE_SIZE) || 0,
+    });
   } catch (error) {
     console.error("Error fetching reviews:", error);
     throw new Error("Failed to fetch reviews.");
@@ -142,6 +167,40 @@ export async function createOrModifyReview(
     return { success: true, message: `Review ${type} successfully.` };
   } catch (error) {
     console.error("Error creating review:", error);
+    return { success: false, message: formatError(error) };
+  }
+}
+
+interface DeleteReviewParams {
+  user_id: string;
+  product_id: string;
+}
+
+export async function deleteReview(data: DeleteReviewParams) {
+  try {
+    const session = await auth();
+    if (!session) {
+      throw new Error("User is not authorized to delete a review.");
+    }
+
+    const session_id = session?.user?.id;
+
+    if (session_id !== data.user_id) {
+      throw new Error("User ID does not match the session user ID.");
+    }
+
+    const res = await client
+      .db("testDB")
+      .collection<userReviews>("Review")
+      .deleteOne({ user_id: session_id, product_id: data.product_id });
+
+    if (res.deletedCount === 0) {
+      throw new Error("No review found to delete.");
+    }
+    revalidatePath(`/result/${data.product_id}`);
+    return { success: true, message: "Review deleted successfully." };
+  } catch (error) {
+    console.error("Error deleting review:", error);
     return { success: false, message: formatError(error) };
   }
 }

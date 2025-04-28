@@ -1,6 +1,9 @@
 "use client";
 
-import { reviewFormSchemaInsert, reviewFormSchemaUpdate } from "@/lib/validators";
+import {
+  reviewFormSchemaInsert,
+  reviewFormSchemaUpdate,
+} from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ControllerRenderProps, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,17 +25,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { createOrModifyReview } from "@/lib/actions/review.actions";
+import { createOrModifyReview, deleteReview } from "@/lib/actions/review.actions";
 import { Slide, toast } from "react-toastify";
 import { userReviews } from "@/_common/types";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
 
 interface ReviewFormProps {
   user_id: string;
   product_id: string;
   user_name: string;
   user_review?: userReviews;
+  submitted?: boolean;
+  setSubmitted?: (submitted: boolean) => void;
 }
 
 const ReviewForm = ({
@@ -40,16 +44,21 @@ const ReviewForm = ({
   product_id,
   user_name,
   user_review,
+  submitted,
+  setSubmitted,
 }: ReviewFormProps) => {
-  const router = useRouter();
   const form = useForm<z.infer<typeof reviewFormSchemaInsert>>({
-    resolver: zodResolver(user_review ? reviewFormSchemaUpdate : reviewFormSchemaInsert),
+    resolver: zodResolver(
+      user_review ? reviewFormSchemaUpdate : reviewFormSchemaInsert
+    ),
     defaultValues: user_review ? user_review : reviewDefaultValues,
   });
+  const [isPending, startTransition] = useTransition();
+  const [rating, setRating] = useState<number>(5);
 
   useEffect(() => {
     form.reset(user_review ? user_review : reviewDefaultValues);
-  }, [user_review, form]);  
+  }, [user_review, form]);
 
   const onSubmit = async (data: z.infer<typeof reviewFormSchemaInsert>) => {
     const res = await createOrModifyReview(data);
@@ -77,6 +86,9 @@ const ReviewForm = ({
         theme: "colored",
         transition: Slide,
       });
+      if (setSubmitted) {
+        setSubmitted(!submitted);
+      }
     }
   };
 
@@ -105,10 +117,10 @@ const ReviewForm = ({
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value ? field.value.toString() : ""}
+                      defaultValue={field.value ? field.value.toString() : "5"}
                     >
                       <SelectTrigger className="w-40">
-                        <SelectValue placeholder="Select a rating" />
+                        <SelectValue placeholder="Select a rating" defaultValue={rating} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="5">5 Stars</SelectItem>
@@ -124,7 +136,46 @@ const ReviewForm = ({
               )}
             />
 
-            <div className="flex items-center justify-end w-full">
+            <div className="flex items-center justify-end w-full gap-3">
+              {user_review && (
+                <Button type="button" variant="destructive" onClick={() => {startTransition(async() => {
+                  if (user_review) {
+                    const res = await deleteReview({user_id: user_id, product_id: product_id});
+                    if (!res.success) {
+                      toast.error(res.message, {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: false,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: Slide,
+                      });
+                    } else {
+                      toast.success(res.message, {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: false,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: Slide,
+                      });
+                      form.reset(reviewDefaultValues);
+                      setRating(reviewDefaultValues.rating);
+                      if (setSubmitted) {
+                        setSubmitted(!submitted);
+                      }
+                    }
+                  }
+                })}}>
+                  {isPending ? "Deleting..." : "Delete Review"}
+                </Button>
+              )}
               <Button
                 type="submit"
                 className="w-40 hover:bg-green-400"
@@ -135,7 +186,11 @@ const ReviewForm = ({
                   form.setValue("user_name", user_name)
                 )}
               >
-                {form.formState.isSubmitting ? "Submitting..." : "Submit"}
+                {form.formState.isSubmitting
+                  ? "Submitting..."
+                  : user_review
+                  ? "Update"
+                  : "Submit"}
               </Button>
             </div>
           </div>
@@ -151,7 +206,7 @@ const ReviewForm = ({
               >;
             }) => (
               <FormItem>
-                <FormLabel>Written Review</FormLabel>
+                <FormLabel>Review</FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}

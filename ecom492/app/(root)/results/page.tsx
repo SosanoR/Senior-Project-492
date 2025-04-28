@@ -98,12 +98,12 @@ const ResultsPage = async (props: {
   }
 
   if (!res) {
-    res = JSON.stringify({ data: [], totalPages: 1 });
+    res = JSON.stringify({ data: [], totalPages: 1, totalFound: 0 });
   }
   const products: {
     data: ProductResultsCardProps[];
     totalPages: number;
-    categories: string[];
+    totalFound: number;
   } = JSON.parse(res);
 
   return (
@@ -274,6 +274,7 @@ const ResultsPage = async (props: {
 
       <div className="space-y-4 md:flex md:flex-col md:gap-4 md:col-span-3">
         <SortingOptions sortMethod={sort || "Default"} />
+        <div className="text-2xl">{`Showing results ${((page - 1) * PAGE_SIZE) + (products.data.length !== 0 ? 1 : 0)}-${(PAGE_SIZE * (page - 1)) + products.data.length } of ${products.totalFound}`}</div>
 
         <div className="flex flex-col grow gap-2 ">
           {products?.data?.length === 0 && (

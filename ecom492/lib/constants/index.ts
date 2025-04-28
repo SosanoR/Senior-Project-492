@@ -28,16 +28,16 @@ export const reviewDefaultValues = {
   user_name: "",
   product_id: "",
   text: "",
-  rating: 0,
+  rating: 5,
 };
 
-export const PAGE_SIZE = 2;
+export const PAGE_SIZE = 1;
 
 export const productDefaultVals = {
   name: "",
   description: "",
   quantity: 0,
-  price: "",
+  price: 0,
   brand: "",
   category: "",
   images: [],

@@ -10,8 +10,7 @@ const ProductList = ({ products, title }: ProductListProps) => {
   return (
     <div>
       <div className="flex justify-start">
-
-      <h2 className="h2-bold mb-4">{title}</h2>
+        <h2 className="h2-bold mb-4">{title}</h2>
       </div>
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 justify-items-center">
@@ -22,6 +21,7 @@ const ProductList = ({ products, title }: ProductListProps) => {
               images={product.images}
               name={product.name}
               price={product.price}
+              discount={product.discount}
               quantity={product.quantity}
               average_rating={product.average_rating}
             />

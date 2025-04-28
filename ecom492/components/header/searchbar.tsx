@@ -14,6 +14,7 @@ const SearchBar = () => {
 
   const router = useRouter();
 
+
   const getSuggestions = async (query: string) => {
     if (timer) {
       clearTimeout(timer);
@@ -27,7 +28,7 @@ const SearchBar = () => {
         if (res) {
           setSuggestions(res);
         }
-      }, 300)
+      }, 100)
     );
   };
 
@@ -43,11 +44,15 @@ const SearchBar = () => {
     const form = e.target as HTMLFormElement;
     const input = form.querySelector("input[type='search']") as HTMLInputElement;
     const query = input.value.trim();
-    if (query) {
+    setSuggestions([]);
+    if (query || query.length > 0) {
       router.push(`/results?${new URLSearchParams({ query }).toString()}`);
     }
-    setSuggestions([]);
   };
+
+  const handleOutOfFocus = () => {
+    setSuggestions([]);
+  }
 
   return (
     <>
@@ -55,7 +60,7 @@ const SearchBar = () => {
         <div className="flex justify-center">
           <div className="relative grid">
             <div className="flex w-full items-center">
-              <Input id="website-searchbar" type="search" placeholder="Search here" onChange={(text) => getSuggestions(text.target.value)} />
+              <Input id="website-searchbar" type="search" placeholder="Search here" onChange={(text) => getSuggestions(text.target.value) } onBlur={handleOutOfFocus} />
               {suggestions && (
                 <ul className="absolute top-[2.5rem] bg-black text-white dark:bg-white dark:text-black w-full rounded">
                   {suggestions.map((item: suggestionsProps, index) => (

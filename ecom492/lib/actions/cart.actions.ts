@@ -9,15 +9,19 @@ import { cartItemSchema, cartSchema } from "../validators";
 import { calcPrice } from "../utils";
 import { revalidatePath } from "next/cache";
 
-export async function addToCart(data: {
-  product_id: string;
-  name: string;
-  brand: string;
-  price: number;
-  quantity: number;
-  image: string;
-  average_rating?: number;
-}, quantity = 1) {
+export async function addToCart(
+  data: {
+    product_id: string;
+    name: string;
+    brand: string;
+    price: number;
+    discount: number;
+    quantity: number;
+    image: string;
+    average_rating?: number;
+  },
+  quantity = 1
+) {
   try {
     const session = await auth();
     const user_id = session?.user?.id ? session.user.id.toString() : undefined;
@@ -47,6 +51,9 @@ export async function addToCart(data: {
         items: [item],
         cart_id: cart_id,
         ...calcPrice([item]),
+        status: "active",
+        created_on: new Date(),
+        last_modified: new Date(),
       });
 
       await client.db("testDB").collection("Cart").insertOne(newCart);
@@ -84,7 +91,7 @@ export async function addToCart(data: {
             },
           }
         );
-        revalidatePath(`/result/${item.product_id}`);
+      revalidatePath(`/result/${item.product_id}`);
     }
 
     return {
@@ -93,77 +100,98 @@ export async function addToCart(data: {
     };
   } catch (error) {
     console.error("Error adding to cart:", error);
-    throw new Error("Failed to add to cart.");
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to add to cart.",}
   }
 }
 
-export async function removeFromCart(product_id: string, quantity = 1, remove_all = false) {
-    try {
-        
-        const cart_id = (await cookies()).get("cart_id")?.value;
-        if (!cart_id) {
-            throw new Error("Cart ID not found in cookies.");
-        }
-
-        const cart = await findCart();
-        if (!cart) {
-            throw new Error("Cart not found.");
-        }
-
-        const found_item = cart.items.find((prod) => prod.product_id === product_id);
-        if (!found_item) {
-            throw new Error("Product not found in cart.");
-        }
-
-        if((found_item.quantity <= quantity) || remove_all) {
-            cart.items = cart.items.filter((prod) => prod.product_id !== found_item.product_id);
-        } else {
-            cart.items.find((prod) => prod.product_id === found_item.product_id)!.quantity = found_item.quantity - quantity;
-        }
-
-        await client
-            .db("testDB")
-            .collection<cart>("Cart")
-            .updateOne(
-                { _id: new ObjectId(cart._id) },
-                {
-                    $set: {
-                        items: cart.items,
-                        total_price: calcPrice(cart.items).total_price,
-                    },
-                }
-            );
-        revalidatePath(`/result/${found_item.product_id}`);
-
-        return {
-            success: true,
-            message: `${found_item.name} was removed.`,
-        };
-
-    } catch (error) {
-        console.error("Error removing from cart:", error);
-        throw new Error("Failed to remove from cart.");
-    }
-}
-
-export async function editCartItemQuantity(product_id: string, quantity: number, user_cart: cart) {
+export async function removeFromCart(
+  product_id: string,
+  quantity = 1,
+  remove_all = false
+) {
   try {
     const cart_id = (await cookies()).get("cart_id")?.value;
     if (!cart_id) {
       throw new Error("Cart ID not found in cookies.");
     }
 
-    if (cart_id !== user_cart.cart_id) {
-      throw new Error("Cart ID does not match the user's cart.");
-    }
-
-
     const cart = await findCart();
     if (!cart) {
       throw new Error("Cart not found.");
     }
 
-    const found_item = cart.items.find((prod) => prod.product_id === product_id);
+    const found_item = cart.items.find(
+      (prod) => prod.product_id === product_id
+    );
+    if (!found_item) {
+      throw new Error("Product not found in cart.");
+    }
+
+    if (found_item.quantity <= quantity || remove_all) {
+      cart.items = cart.items.filter(
+        (prod) => prod.product_id !== found_item.product_id
+      );
+    } else {
+      cart.items.find(
+        (prod) => prod.product_id === found_item.product_id
+      )!.quantity = found_item.quantity - quantity;
+    }
+
+    await client
+      .db("testDB")
+      .collection<cart>("Cart")
+      .updateOne(
+        { _id: new ObjectId(cart._id) },
+        {
+          $set: {
+            items: cart.items,
+            total_price: calcPrice(cart.items).total_price,
+          },
+        }
+      );
+    revalidatePath(`/result/${found_item.product_id}`);
+
+    return {
+      success: true,
+      message: `${found_item.name} was removed.`,
+    };
+  } catch (error) {
+    console.error("Error removing from cart:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to remove from cart.",
+    }
+  }
+}
+
+export async function editCartItemQuantity(
+  product_id: string,
+  quantity: number,
+  user_cart: cart
+) {
+  try {
+    const cart = await findCart();
+    if (!cart) {
+      throw new Error("Cart not found.");
+    }
+
+
+    const cart_id = (await cookies()).get("cart_id")?.value;
+    if (!cart_id) {
+      throw new Error("Cart ID not found in cookies.");
+    }
+
+    if ((cart_id !== user_cart.cart_id) && (cart.user_id !== user_cart.user_id)) {
+      throw new Error("Cart ID does not match the user's cart.");
+    }
+
+
+    const found_item = cart.items.find(
+      (prod) => prod.product_id === product_id
+    );
+
     if (!found_item) {
       throw new Error("Product not found in cart.");
     }
@@ -185,17 +213,15 @@ export async function editCartItemQuantity(product_id: string, quantity: number,
       throw new Error("Product not found.");
     }
 
-    if (product.quantity < quantity) {
+    if ((product.quantity < quantity) || (product.quantity < found_item.quantity)) {
       throw new Error("Not enough product in stock.");
     }
 
-    if (product.quantity < found_item.quantity) {
-      throw new Error("Not enough product in stock.");
+    if (found_item.quantity === 0) {
+      cart.items = cart.items.filter(
+        (prod) => prod.product_id !== found_item.product_id
+      );
     }
-
-    if((found_item.quantity === 0)) {
-      cart.items = cart.items.filter((prod) => prod.product_id !== found_item.product_id);
-  } 
 
     await client
       .db("testDB")
@@ -209,17 +235,18 @@ export async function editCartItemQuantity(product_id: string, quantity: number,
           },
         }
       );
-      revalidatePath(`/cart`);
+    revalidatePath(`/cart`);
 
     return {
       success: true,
       message: `${found_item.name} quantity updated to ${quantity}.`,
     };
-    
   } catch (error) {
     console.error("Error editing cart item quantity:", error);
-    throw new Error("Failed to edit cart item quantity.");
-    
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to edit cart item quantity.",
+    };
   }
 }
 
@@ -238,7 +265,7 @@ export async function findCart() {
       cart = await client
         .db("testDB")
         .collection<cart>("Cart")
-        .findOne<cart>({ user_id: user_id });
+        .findOne<cart>({ user_id: user_id, status: "active" });
     } else {
       cart = await client
         .db("testDB")
@@ -259,5 +286,3 @@ export async function findCart() {
     throw new Error("Failed to find cart.");
   }
 }
-
-

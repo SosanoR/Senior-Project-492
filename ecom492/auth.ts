@@ -1,4 +1,3 @@
-
 import NextAuth from "next-auth";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -8,10 +7,11 @@ import { user_data } from "./_common/types";
 import { ObjectId } from "mongodb";
 import { authConfig } from "./auth.config";
 import { cookies } from "next/headers";
+import { cart } from "./_common/types";
+
 const config = {
   pages: {
     signIn: "/login",
-    error: "/login",
   },
   session: {
     strategy: "jwt" as const,
@@ -69,6 +69,7 @@ const config = {
       return session;
     },
     async jwt({ token, user, trigger, session }: any) {
+
       if (user) {
         token.role = user.role;
         if (user.name === "") {
@@ -87,13 +88,59 @@ const config = {
           if (cart_id) {
             const cart = await client
               .db("testDB")
-              .collection("Cart")
+              .collection<cart>("Cart")
               .findOne({ cart_id: cart_id });
-            
-              if (cart) {
 
-               const found = await client.db("testDB").collection("Cart").updateOne({cart_id: cart_id}, {$set: {user_id: user.id}});
+            const prevCart = await client
+              .db("testDB")
+              .collection<cart>("Cart")
+              .findOne({ user_id: user.id, status: "active" });
+
+            if (prevCart) {
+              if (cart) {
+                for (const item of cart.items) {
+                  const existingItem = prevCart.items.find(
+                    (cartItem) => cartItem.product_id === item.product_id
+                  );
+                  if (existingItem) {
+                    existingItem.quantity += item.quantity;
+                    cart.items = cart.items.filter(
+                      (cartItem) => cartItem.product_id !== item.product_id
+                    );
+                  } else {
+                    prevCart.items.push(item);
+                  }
+                }
+
+                await client
+                  .db("testDB")
+                  .collection<cart>("Cart")
+                  .updateOne(
+                    { user_id: user.id, status: "active" },
+                    {
+                      $set: {
+                        items: [...prevCart.items],
+                        total_price: prevCart.total_price + cart.total_price,
+                      },
+                    }
+                  );
               }
+
+              await client
+                .db("testDB")
+                .collection<cart>("Cart")
+                .deleteOne({ cart_id: cart_id });
+
+              cookie.set("cart_id", crypto.randomUUID());
+            } else if (cart) {
+              await client
+                .db("testDB")
+                .collection<cart>("Cart")
+                .updateOne(
+                  { cart_id: cart_id },
+                  { $set: { user_id: user.id } }
+                );
+            }
           }
         }
       }
@@ -101,6 +148,13 @@ const config = {
     },
     ...authConfig.callbacks,
   },
-}
+  events: {
+    async signOut({ token }) {
+      const cookie = await cookies();
+      cookie.set("cart_id", crypto.randomUUID());
+      console.log("Cart ID reset on sign out");
+    },
+  },
+};
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config);

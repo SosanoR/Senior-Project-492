@@ -22,6 +22,7 @@ const CartAddButton = ({
       name: product.name,
       brand: product.brand,
       price: product.price,
+      discount: product.discount,
       quantity: 1,
       image: product.image,
       average_rating: product.average_rating,

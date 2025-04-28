@@ -63,6 +63,7 @@ const CartPage = async () => {
                           images={[item.image]}
                           brand={item.brand}
                           price={item.price}
+                          discount={item.discount}
                           average_rating={item.average_rating}
                           height={200}
                           width={200}

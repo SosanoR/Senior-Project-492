@@ -14,6 +14,7 @@ interface ResultCardProps {
   images: string[];
   brand: string;
   price: string | number;
+  discount?: number;
   average_rating: number;
   height: number;
   width: number;
@@ -24,13 +25,14 @@ const ResultCard = ({
   images,
   brand,
   price,
+  discount = 0,
   average_rating,
   height,
   width,
   hidden = false,
 }: ResultCardProps) => {
   return (
-    <Card className="flex w-full flex-cols-2">
+    <Card className="flex w-full flex-cols-2 p-1 m-1">
       <CardContent className={`${hidden ?  "hidden sm:flex" : "flex"} justify-start self-center p-3`}>
         <ProductImage
           width={width}
@@ -40,12 +42,12 @@ const ResultCard = ({
         />
       </CardContent>
       <CardHeader className="w-full">
-        <div className="flex justify-center">
-          <CardTitle className="text-xl">{name}</CardTitle>
+        <div className="flex justify-center p-2 m-1 space-y-2">
+          <CardTitle className="text-lg text-center">{name}</CardTitle>
         </div>
-        <CardDescription className="text-md text-black dark:text-white">
+        <CardDescription className="text-md text-black dark:text-white text-center ">
           <div>Brand: {brand}</div>
-          <div>${price}</div>
+          <div>${(Number(price) * ((100 - discount) / 100)).toFixed(2)}</div>
           <div className="flex space-x-2">
             <div className="flex">
               <DisplayStars rating={average_rating} />

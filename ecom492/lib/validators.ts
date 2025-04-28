@@ -2,7 +2,7 @@ import { z } from "zod";
 import { formatNumberWithPrecision } from "./utils";
 
 const currency = z
-  .string()
+  .coerce.number()
   .refine(
     (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithPrecision(Number(value))),
     "Price must be a number with up to two decimal places."
@@ -14,10 +14,8 @@ export const insertProductSchema = z.object({
   quantity: z.coerce.number(),
   price: currency,
   brand: z.string().min(2, "Brand must be at least 2 characters."),
-  // categories: z.array(z.string()).min(1, "Item must have at least one category."),
-  // images: z.array(z.string()).min(1, "Item must have at least one image."),
   images: z.array(z.string()).min(1, "Product must contain at least one image."),
-  discount: z.coerce.number(),
+  discount: z.coerce.number().min(0, "Discount must be a positive number.").max(100, "Discount cannot be more than 100%."),
   category: z
   .string()
   .min(3, "Must have at least one category with 3 or more characters."),
@@ -83,6 +81,7 @@ export const cartItemSchema = z.object({
   quantity: z.coerce.number().int().nonnegative("Quantity must be a positive number."),
   image: z.string().min(1, "Image is required."),
   price: z.coerce.number().nonnegative("Price must be a positive number."),
+  discount: z.coerce.number().min(0, "Discount must be a positive number.").max(100, "Discount cannot be more than 100%."),
   average_rating: z.coerce.number()
 });
 
@@ -92,4 +91,9 @@ export const cartSchema = z.object({
   items: z.array(cartItemSchema).min(1, "Cart must have at least one item."),
   total_price: z.coerce.number().nonnegative("Total price must be a positive number."),
   cart_id: z.string().min(1, "Cart id is required."),
+  status: z.enum(["active", "completed", "pending"], {
+    message: "Status must be one of: active, completed, pending.",
+  }),
+  created_on: z.coerce.date().optional(),
+  last_modified: z.coerce.date().optional(),
 });

@@ -6,7 +6,6 @@ import {
   insertionData,
   ProductCardProps,
   productFilterQuery,
-  productQuery,
   ProductResultsCardProps,
   suggestionsProps,
   user_data,
@@ -21,6 +20,7 @@ import { z } from "zod";
 import { insertProductSchema, updateProductSchema } from "../validators";
 import cloudinary from "cloudinary";
 
+
 cloudinary.v2.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
@@ -31,6 +31,7 @@ cloudinary.v2.config({
 // Get Best Selling Products
 export async function getBestSelling(limit: number) {
   try {
+
     const collection = client.db("testDB").collection<data>("items");
 
     const data = await collection
@@ -69,6 +70,33 @@ export async function getLatestProducts(limit: number) {
       .toArray();
 
     return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Get Best Selling Electronics Products
+export async function getBestSellingElectronics(limit: number) {
+  try {
+    const collection = client.db("testDB").collection<data>("items");
+
+    const pipeline = [
+      {
+        $search: {
+          index: "user-products-index",
+          text: {
+            query: "Electronics",
+            path: "category",
+            fuzzy: { maxEdits: 2, prefixLength: 2 },
+          }
+        }
+      }
+    ]
+
+    const data = await collection.aggregate<ProductCardProps>(pipeline).sort({ average_rating: -1 }).limit(limit).toArray();
+
+    return data;
+    
   } catch (error) {
     console.log(error);
   }
@@ -536,6 +564,7 @@ export async function getAllSearchResults({
       return JSON.stringify({
         data: data[0].data,
         totalPages: Math.ceil(data[0].metadata[0].totalCount / limit),
+        totalFound: data[0].metadata[0].totalCount,
       });
     }
 

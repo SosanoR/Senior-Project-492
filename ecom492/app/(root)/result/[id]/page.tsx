@@ -13,13 +13,20 @@ import { getUserReview } from "@/lib/actions/review.actions";
 import CartAddButton from "@/components/result-page/product-add-cart";
 import { findCart } from "@/lib/actions/cart.actions";
 
+
 const ProductDetailsPage = async (props: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ page: string }>;
 }) => {
-  const { id } = await props.params;
+  const {id} = await props.params;
+  const searchParams = await props.searchParams;
+  const page = searchParams.page|| "1";
+  const currentPage = Number(page) || 1;
   const product = await findProduct(id);
   const session = await auth();
   let userReview;
+
+  console.log("param", page);
 
   if (session) {
     if (session.user?.id) {
@@ -62,8 +69,14 @@ const ProductDetailsPage = async (props: {
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-center">
                 <ProductPrice
                   value={Number(product.price)}
-                  className="w-24 rounded-full dark:bg-white dark:text-black bg-black text-white px-5 py-2"
+                  discount={product.discount}
+                  className="w-[7rem] rounded-full dark:bg-white dark:text-black bg-black text-white px-5 py-2"
                 />
+                {(product.discount || product.discount > 0) && (
+                  <p className="text-lg text-destructive w-[8rem] h-[3rem] rounded-full bg-green-500   text-white px-5 py-2">
+                    {`Save ${product.discount}%`}
+                  </p>
+                )}
               </div>
             </div>
             <div className="mt-10">
@@ -77,7 +90,11 @@ const ProductDetailsPage = async (props: {
               <CardContent className="p-4">
                 <div className="mb-2 flex justify-between">
                   <div>Price</div>
-                  <ProductPrice value={Number(product.price)} />
+                  <ProductPrice
+                    value={Number(product.price)}
+                    discount={product.discount}
+                    className=""
+                  />
                 </div>
                 <div className="mb-2 flex justify-between">
                   <div>Status</div>
@@ -96,6 +113,7 @@ const ProductDetailsPage = async (props: {
                         name: product.name,
                         brand: product.brand,
                         price: product.price,
+                        discount: product.discount,
                         quantity: product.quantity,
                         image: product.images[0],
                         average_rating: product.average_rating,
@@ -116,6 +134,7 @@ const ProductDetailsPage = async (props: {
           user_name={session?.user?.name || ""}
           user_review={userReview}
           product_id={product._id.toString()}
+          id={id}
         />
       </section>
     </>

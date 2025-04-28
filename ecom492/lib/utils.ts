@@ -47,9 +47,10 @@ export function convertToPlainObject<T>(obj: T): T {
 
 interface item {
   price: number;
+  discount: number;
   quantity: number;
 }
 
 export function calcPrice<T extends item>(arr: T[]): {total_price: number} {
-  return {total_price: (arr.reduce((acc: number, item: T) => acc + item.price * item.quantity, 0)).toFixed(2)};
+  return {total_price: Number((arr.reduce((acc: number, item: T) => acc + ((item.price * ((100 - item.discount) / 100)) * item.quantity), 0)).toFixed(2))};
 }

@@ -51,19 +51,6 @@ const AdminProductsPage = async (props: {
     user_id: session.user?.id,
   });
 
-  // if (!res) {
-  //   return (
-  //     <div className="flex-between">
-  //       <h1 className="h2-bold">No Products Found</h1>
-  //       <div className="flex space-x-2">
-  //         <ProductFilter />
-  //         <Button variant="default" asChild>
-  //           <Link href="/admin/products/create">Create Product</Link>
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   if (!res) {
     res = JSON.stringify({data: [], totalPages: 0});
@@ -76,7 +63,7 @@ const AdminProductsPage = async (props: {
     return redirect("/admin/products");
   }
   return (
-    <div className="space-y-2 flex flex-col">
+    <div className="space-y-2 flex flex-col h-full">
       <div className="flex-between">
         <h1 className="h2-bold">Products</h1>
         <div className="flex space-x-2">
@@ -95,7 +82,7 @@ const AdminProductsPage = async (props: {
           </p>
         </div>
       )}
-
+      <div className="flex w-full h-full">
       {products?.data.length > 0 && (
         <Table>
           <TableHeader>
@@ -142,6 +129,7 @@ const AdminProductsPage = async (props: {
           </TableBody>
         </Table>
       )}
+      </div>
 
       {products?.totalPages && products?.totalPages > 1 && (
         <Pagination>

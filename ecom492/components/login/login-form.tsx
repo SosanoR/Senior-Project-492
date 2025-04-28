@@ -5,17 +5,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signInDefaultValues } from "@/lib/constants";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { signInWithCredentials } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
 import { Checkbox } from "../ui/checkbox";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 const LoginForm = () => {
   const [data, action] = useActionState(signInWithCredentials, {
     success: false,
     message: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -24,21 +28,19 @@ const LoginForm = () => {
     const { pending } = useFormStatus();
     return (
       <Button disabled={pending} className="w-full" variant="default">
-        {pending ? "Signing in..." : "Login"}
+        {pending ? "Logging in..." : "Login"}
       </Button>
     );
   };
 
   const handleCheckbox = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: CheckedState
   ) => {
-    const checkbox = e.currentTarget as HTMLInputElement;
-    const passwordField = document.getElementById(
-      "password"
-    ) as HTMLInputElement;
-    checkbox.checked = !checkbox.checked;
-
-    passwordField.type = checkbox.checked ? "text" : "password";
+    const checkbox = e.valueOf() ;
+    console.log(`checkbox.checked`, checkbox);
+    if (typeof checkbox === "boolean") {
+      setShowPassword(checkbox);
+    }
   };
 
   return (
@@ -62,7 +64,7 @@ const LoginForm = () => {
           <Input
             id="password"
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             required
             autoComplete="password"
             defaultValue={signInDefaultValues.password}
@@ -70,7 +72,7 @@ const LoginForm = () => {
         </div>
 
         <div className="flex justify-end items-center gap-2">
-          <Checkbox id="showPassword" onClick={handleCheckbox} />
+          <Checkbox id="showPassword" onCheckedChange={(e) => handleCheckbox(e)}/>
           <Label htmlFor="showPassword" className="ml-2">
             Show Password
           </Label>

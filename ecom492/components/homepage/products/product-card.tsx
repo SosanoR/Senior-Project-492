@@ -12,6 +12,7 @@ const ProductCard = ({
   name,
   images,
   price,
+  discount,
   quantity,
   average_rating,
 }: ProductCardProps) => {
@@ -20,7 +21,12 @@ const ProductCard = ({
 
   return (
     <Card className="w-full max-w-sm">
-      <CardHeader className="p-2 items-center">
+      {(discount && discount > 0 ) ? (
+        <div className="relative top-0 right-0 w-[5rem] bg-red-500 text-white p-1 rounded-md text-base font-bold ">
+          {discount}% OFF
+        </div>
+      ): <div className="invisible m-2">hidden</div>}
+      <CardHeader className=" p-2 items-center">
         <Link href={`/result/${_id}`}>
           <ProductImage
             images={images}
@@ -31,7 +37,7 @@ const ProductCard = ({
         </Link>
       </CardHeader>
 
-      <CardContent className="p-4 grid gap-4">
+      <CardContent className=" p-4 grid gap-4">
         <Link href={`/result/${_id}`}>
           <h2 className="text-sm font-medium">{formatToTitleCase(name)}</h2>
         </Link>
@@ -43,7 +49,7 @@ const ProductCard = ({
             </div>
           </div>
           {quantity > 0 ? (
-            <ProductPrice value={Number(price)} />
+            <ProductPrice value={Number(price)} discount={discount} />
           ) : (
             <p className="text-destructive">Out of Stock</p>
           )}
