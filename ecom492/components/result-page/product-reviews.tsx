@@ -29,7 +29,7 @@ interface ProductReviewsProps {
   user_name: string;
   product_id: string;
   user_review?: userReviews;
-  // page?: number;
+  page?: number;
   id: string;
 }
 
@@ -38,12 +38,11 @@ const ProductReviews = ({
   user_name,
   product_id,
   user_review,
-
+  page = 1,
 }: ProductReviewsProps) => {
   const [reviews, setReviews] = useState<userReviews[]>([]);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [submitted, setSubmitted] = useState(false);
-  const [page, setPage] = useState<number>(1);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -154,9 +153,7 @@ const ProductReviews = ({
                     : `?page=${totalPages}`
                 }
                 className={
-                  page === totalPages
-                    ? "pointer-events-none opacity-50"
-                    : ""
+                  page === totalPages ? "pointer-events-none opacity-50" : ""
                 }
               />
             </PaginationItem>

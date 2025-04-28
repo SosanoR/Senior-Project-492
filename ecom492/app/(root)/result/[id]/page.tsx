@@ -135,6 +135,7 @@ const ProductDetailsPage = async (props: {
           user_review={userReview}
           product_id={product._id.toString()}
           id={id}
+          page={currentPage}
         />
       </section>
     </>
