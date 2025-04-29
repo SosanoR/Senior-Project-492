@@ -152,7 +152,6 @@ const config = {
     async signOut({ token }) {
       const cookie = await cookies();
       cookie.set("cart_id", crypto.randomUUID());
-      console.log("Cart ID reset on sign out");
     },
   },
 };

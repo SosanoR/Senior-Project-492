@@ -37,7 +37,6 @@ const LoginForm = () => {
     e: CheckedState
   ) => {
     const checkbox = e.valueOf() ;
-    console.log(`checkbox.checked`, checkbox);
     if (typeof checkbox === "boolean") {
       setShowPassword(checkbox);
     }

@@ -26,8 +26,6 @@ const ProductDetailsPage = async (props: {
   const session = await auth();
   let userReview;
 
-  console.log("param", page);
-
   if (session) {
     if (session.user?.id) {
       await recordUserLastViewed(id, session.user.id);
@@ -45,17 +43,17 @@ const ProductDetailsPage = async (props: {
     <>
       <section>
         <div className="grid grid-cols-1 md:grid-cols-5">
-          {/* Images Col */}
+
           <div className="col-span-2">
             <ProductImages images={product.images} />
           </div>
-          {/* Details Col */}
+
           <div className="col-span-2 p-5">
             <div className="flex flex-col gap-6">
               <p className="text-lg">Brand: {product.brand}</p>
               <p className="text-lg">Category: {product.category}</p>
               <h1 className="h3-bold">{product.name}</h1>
-              {/* Ratings count.*/}
+
               <div className="flex items-center gap-5">
                 <Button variant="outline" className="hover:cursor-default">
                   {product.average_rating}
@@ -84,16 +82,15 @@ const ProductDetailsPage = async (props: {
               <div>{product.description}</div>
             </div>
           </div>
-          {/* Action col */}
+
           <div>
             <Card>
               <CardContent className="p-4">
                 <div className="mb-2 flex justify-between">
                   <div>Price</div>
                   <ProductPrice
-                    value={Number(product.price)}
-                    discount={product.discount}
-                    className=""
+                    value={Number(product.price) * ((100 - product.discount) / 100)}
+                    className={product.discount > 0 ? "text-green-600" : ""}
                   />
                 </div>
                 <div className="mb-2 flex justify-between">

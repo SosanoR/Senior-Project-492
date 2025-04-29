@@ -124,7 +124,7 @@ const ProductReviews = ({
         ))}
       </div>
 
-      {totalPages && totalPages > 1 && (
+      {(totalPages && totalPages > 1) ? (
         <Pagination>
           <PaginationContent>
             <PaginationItem>
@@ -159,7 +159,7 @@ const ProductReviews = ({
             </PaginationItem>
           </PaginationContent>
         </Pagination>
-      )}
+      ): null}
     </div>
   );
 };

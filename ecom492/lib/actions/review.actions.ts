@@ -13,7 +13,6 @@ import { PAGE_SIZE } from "../constants";
 export async function getReviews(product_id: string, page: number = 1) {
   try {
 
-    console.log("page:", page);
     const pipeline = [
       {
         $match: { product_id },
@@ -161,7 +160,6 @@ export async function createOrModifyReview(
         }
       );
 
-    console.log(`product ${review.product_id} updated`);
     revalidatePath(`/result/${review.product_id}`);
 
     return { success: true, message: `Review ${type} successfully.` };
@@ -197,6 +195,42 @@ export async function deleteReview(data: DeleteReviewParams) {
     if (res.deletedCount === 0) {
       throw new Error("No review found to delete.");
     }
+
+        // Update the product's average rating and reviewer count
+        const reviews = await client
+        .db("testDB")
+        .collection("Review")
+        .aggregate([
+          { $match: { product_id: data.product_id } },
+          {
+            $group: {
+              _id: null,
+              average_rating: { $avg: "$rating" },
+              reviewer_count: { $sum: 1 },
+            },
+          },
+        ])
+        .toArray();
+      if (reviews.length === 0) {
+        throw new Error("No reviews found for this product.");
+      }
+      const averageRating = reviews[0].average_rating;
+      const reviewerCount = reviews[0].reviewer_count;
+  
+      await client
+        .db("testDB")
+        .collection("items")
+        .updateOne(
+          { _id: new ObjectId(data.product_id) },
+          {
+            $set: {
+              average_rating: averageRating,
+              reviewer_count: reviewerCount,
+            },
+          }
+        );
+  
+
     revalidatePath(`/result/${data.product_id}`);
     return { success: true, message: "Review deleted successfully." };
   } catch (error) {

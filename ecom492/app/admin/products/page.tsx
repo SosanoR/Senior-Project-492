@@ -51,11 +51,10 @@ const AdminProductsPage = async (props: {
     user_id: session.user?.id,
   });
 
-
   if (!res) {
-    res = JSON.stringify({data: [], totalPages: 0});
+    res = JSON.stringify({ data: [], totalPages: 0 });
   }
-  
+
   const products: { data: userProductData[]; totalPages: number } =
     JSON.parse(res);
 
@@ -64,14 +63,20 @@ const AdminProductsPage = async (props: {
   }
   return (
     <div className="space-y-2 flex flex-col h-full">
-      <div className="flex-between">
-        <h1 className="h2-bold">Products</h1>
-        <div className="flex space-x-2">
+
+      <div className="flex-col md:flex-row justify-center md:flex-between  w-full ">
+
+        <div className="flex justify-center m-2">
+          <h1 className="h2-bold">Products</h1>
+        </div>
+
+        <div className="flex space-x-2 justify-center items-center">
           <ProductFilter />
           <Button variant="default" asChild>
             <Link href="/admin/products/create">Create Product</Link>
           </Button>
         </div>
+
       </div>
 
       {products?.data.length === 0 && (
@@ -83,52 +88,52 @@ const AdminProductsPage = async (props: {
         </div>
       )}
       <div className="flex w-full h-full">
-      {products?.data.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>NAME</TableHead>
-              <TableHead>PRICE</TableHead>
-              <TableHead>CATEGORIES</TableHead>
-              <TableHead>QUANTITY</TableHead>
-              <TableHead>RATING</TableHead>
-              <TableHead className="w-[100px]">ACTIONS</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products?.data.map((product) => (
-              <TableRow key={String(product._id)}>
-                <TableCell>{String(product._id)}</TableCell>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>
-                  ${formatNumberWithPrecision(Number(product.price))}
-                </TableCell>
-                <TableCell>{formatToTitleCase(product.category)}</TableCell>
-                <TableCell>{product.quantity}</TableCell>
-                <TableCell>{product.average_rating} stars</TableCell>
-                <TableCell className="flex gap-1">
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="hover:bg-blue-500"
-                  >
-                    <Link href={`/admin/products/update/${product._id}`}>
-                      Modify
-                    </Link>
-                  </Button>
-
-                  <DeleteDialog
-                    id={`${product._id}`}
-                    action={deleteUserProduct}
-                  />
-                </TableCell>
+        {products?.data.length > 0 && (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>NAME</TableHead>
+                <TableHead>PRICE</TableHead>
+                <TableHead>CATEGORIES</TableHead>
+                <TableHead>QUANTITY</TableHead>
+                <TableHead>RATING</TableHead>
+                <TableHead className="w-[100px]">ACTIONS</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+            </TableHeader>
+            <TableBody>
+              {products?.data.map((product) => (
+                <TableRow key={String(product._id)}>
+                  <TableCell>{String(product._id)}</TableCell>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>
+                    ${formatNumberWithPrecision(Number(product.price))}
+                  </TableCell>
+                  <TableCell>{formatToTitleCase(product.category)}</TableCell>
+                  <TableCell>{product.quantity}</TableCell>
+                  <TableCell>{product.average_rating} stars</TableCell>
+                  <TableCell className="flex gap-1">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="hover:bg-blue-500"
+                    >
+                      <Link href={`/admin/products/update/${product._id}`}>
+                        Modify
+                      </Link>
+                    </Button>
+
+                    <DeleteDialog
+                      id={`${product._id}`}
+                      action={deleteUserProduct}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       {products?.totalPages && products?.totalPages > 1 && (

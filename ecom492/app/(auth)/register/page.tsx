@@ -7,11 +7,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Metadata } from "next";
-import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import Image from "next/image";
-import { APP_NAME } from "@/lib/constants";
+import Logo from "@/components/shared/logo";
 
 export const metadata: Metadata = {
   title: "Register",
@@ -33,16 +31,7 @@ const RegistrationPage = async (props: {
     <div className="w-fill max-w-md mx-auto">
       <Card>
         <CardHeader className="space-y-4">
-        <Link href="/" className="flex justify-center items-center">
-            <Image
-              src="/images/logo.svg"
-              alt={`${APP_NAME} logo`}
-              height={48}
-              width={48}
-              priority={true}
-              className="dark:bg-white rounded-xl"
-            />
-          </Link>
+          <Logo />
           <CardTitle className="text-center">Register Account</CardTitle>
           <CardDescription className="text-center">
             Fill in information below to register an account.

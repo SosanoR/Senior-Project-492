@@ -286,3 +286,46 @@ export async function findCart() {
     throw new Error("Failed to find cart.");
   }
 }
+
+export async function emptyCart() {
+  try {
+    const session = await auth();
+    const user_id = session?.user?.id ? session.user.id.toString() : undefined;
+    const cart_id = (await cookies()).get("cart_id")?.value;
+
+    if (!cart_id) {
+      throw new Error("Cart ID not found in cookies.");
+    }
+
+    const cart = await findCart();
+    if (!cart) {
+      throw new Error("Cart not found.");
+    }
+    if ((cart_id !== cart.cart_id) && (cart.user_id !== user_id)) {
+      throw new Error("Cart ID does not match the user's cart.");
+    }
+
+    await client
+      .db("testDB")
+      .collection<cart>("Cart")
+      .updateOne(
+        { _id: new ObjectId(cart._id) },
+        {
+          $set: {
+            items: [],
+            total_price: 0,
+            last_modified: new Date(),
+          },
+        }
+      );
+    revalidatePath(`/cart`);
+    
+  } catch (error) {
+    console.error("Error emptying cart:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to empty cart.",
+    };
+    
+  }
+}

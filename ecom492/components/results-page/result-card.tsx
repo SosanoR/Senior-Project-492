@@ -41,13 +41,13 @@ const ResultCard = ({
           name={name}
         />
       </CardContent>
-      <CardHeader className="w-full">
+      <CardHeader className="w-full justify-center items-center">
         <div className="flex justify-center p-2 m-1 space-y-2">
           <CardTitle className="text-lg text-center">{name}</CardTitle>
         </div>
-        <CardDescription className="text-md text-black dark:text-white text-center ">
+        <CardDescription className="text-md text-black dark:text-white text-center justify-center ">
           <div>Brand: {brand}</div>
-          <div>${(Number(price) * ((100 - discount) / 100)).toFixed(2)}</div>
+          <div className={discount >  0 ? "text-green-400" : ""}>${(Number(price) * ((100 - discount) / 100)).toFixed(2)}</div>
           <div className="flex space-x-2">
             <div className="flex">
               <DisplayStars rating={average_rating} />

@@ -25,7 +25,7 @@ const CartQuantity = ({
     <>
       <Button
         variant="default"
-        className=""
+        className="hover:bg-green-600"
         onClick={() =>
           startTransition(async () => {
             if (user_cart) {

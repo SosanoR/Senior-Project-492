@@ -37,7 +37,7 @@ const MinMaxFilter = ({query, category, sort, brand, min, max, page}: SearchPara
     const newMax = e.target.value;
     const params = new URLSearchParams(window.location.search);
     params.set("max", newMax);
-    params.set("page", "1");
+    params.set("currentPage", "1");
     if (timer) {
       clearTimeout(timer);
     }
@@ -52,12 +52,12 @@ const MinMaxFilter = ({query, category, sort, brand, min, max, page}: SearchPara
     <div className="pl-4">
       <div>
         <Label htmlFor="min-price">Min Price</Label>
-        <Input id="min-price" type="number" placeholder="0" min={0} max={10000} className="w-20"  onChange={handleMinChange}/>
+        <Input id="min-price" type="number" placeholder="0" min={0} max={10000} className="w-20 text-green-500"  onChange={handleMinChange}/>
       </div>
 
       <div>
         <Label htmlFor="max-price">Max Price</Label>
-        <Input id="max-price" type="number" placeholder="1000" min={0} max={10000} className="w-20" onChange={handleMaxChange}/>
+        <Input id="max-price" type="number" placeholder="1000" min={0} max={10000} className="w-20 text-green-500" onChange={handleMaxChange}/>
       </div>
     </div>
   );

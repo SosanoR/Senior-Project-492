@@ -20,7 +20,6 @@ import { z } from "zod";
 import { insertProductSchema, updateProductSchema } from "../validators";
 import cloudinary from "cloudinary";
 
-
 cloudinary.v2.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
@@ -31,7 +30,6 @@ cloudinary.v2.config({
 // Get Best Selling Products
 export async function getBestSelling(limit: number) {
   try {
-
     const collection = client.db("testDB").collection<data>("items");
 
     const data = await collection
@@ -88,15 +86,48 @@ export async function getBestSellingElectronics(limit: number) {
             query: "Electronics",
             path: "category",
             fuzzy: { maxEdits: 2, prefixLength: 2 },
-          }
-        }
-      }
-    ]
+          },
+        },
+      },
+    ];
 
-    const data = await collection.aggregate<ProductCardProps>(pipeline).sort({ average_rating: -1 }).limit(limit).toArray();
+    const data = await collection
+      .aggregate<ProductCardProps>(pipeline)
+      .sort({ average_rating: -1 })
+      .limit(limit)
+      .toArray();
 
     return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Get Top Discounts Products
+export async function getTopDiscounts(limit: number) {
+  try {
+    const collection = client.db("testDB").collection<data>("items");
+
+    const pipeline = [
+      {
+        $match: {
+          discount: { $gt: 0 },
+        },
+      },
+      {
+        $sort: { discount: -1, average_rating: -1 },
+
+      },
+      {
+        $limit: limit,
+      },
+    ];
+
+    const data = await collection
+    .aggregate<ProductCardProps>(pipeline)
+    .toArray();
     
+    return data;
   } catch (error) {
     console.log(error);
   }
@@ -105,9 +136,9 @@ export async function getBestSellingElectronics(limit: number) {
 // Get products last viewed by user
 export async function getLastViewedProducts(limit: number, user_id: string) {
   try {
-    const userCollection = client.db("testDB").collection<user_data>("User");
+    const collection = client.db("testDB").collection<user_data>("User");
     const user = { _id: new ObjectId(user_id) };
-    const userExists = await userCollection.findOne(user);
+    const userExists = await collection.findOne(user);
     if (!userExists) {
       throw new Error("User not found.");
     }
@@ -199,7 +230,7 @@ export async function getAutocompleteSuggestions(query: string) {
 
       return convertToPlainObject(data);
     }
-    return [];
+    return undefined;
   } catch (error) {
     console.log(error);
     return [];
@@ -215,17 +246,14 @@ export async function createProduct(
     const product = insertProductSchema.parse(data);
 
     const collection = client.db("testDB").collection<insertionData>("items");
-    const initRating = Math.random();
-    const rating = Number(
-      (initRating >= 0.5 ? initRating * 5 : (initRating + 0.5) * 5).toFixed(1)
-    );
+
     const sells = Number((Math.random() * 1000).toFixed(0));
-    const reviewers = Number((Math.random() * sells).toFixed(0));
+
 
     await collection.insertOne({
       ...product,
-      average_rating: rating,
-      reviewer_count: reviewers,
+      average_rating: 0,
+      reviewer_count: 0,
       units_sold: sells,
       user_id: session_id,
       created_on: new Date(),
@@ -505,7 +533,7 @@ export async function getAllSearchResults({
       });
     }
 
-    if (max && (!min || (Number(min) <= Number(max)))) {
+    if (max && (!min || Number(min) <= Number(max))) {
       filteredPipeline.push({
         $match: {
           price: { $lte: Number(max) },
@@ -513,17 +541,19 @@ export async function getAllSearchResults({
       });
     }
 
-    if (sort === "price-l-h" || sort === "price-h-l" || sort === "rating-l-h" || sort === "rating-h-l") {
+    if (
+      sort === "price-l-h" ||
+      sort === "price-h-l" ||
+      sort === "rating-l-h" ||
+      sort === "rating-h-l"
+    ) {
       if (sort === "price-l-h") {
         filteredPipeline.push({ $sort: { price: 1, _id: 1 } });
-      }
-      else if (sort === "price-h-l") {
+      } else if (sort === "price-h-l") {
         filteredPipeline.push({ $sort: { price: -1, _id: 1 } });
-      }
-      else if (sort === "rating-l-h") {
+      } else if (sort === "rating-l-h") {
         filteredPipeline.push({ $sort: { average_rating: 1, _id: 1 } });
-      }
-      else if (sort === "rating-h-l") {
+      } else if (sort === "rating-h-l") {
         filteredPipeline.push({ $sort: { average_rating: -1, _id: 1 } });
       }
     }
@@ -552,7 +582,7 @@ export async function getAllSearchResults({
     filteredPipeline.push(...manditoryFilters);
 
     const collection = client.db("testDB").collection<data>("items");
-    // console.log(`filteredPipeline`, filteredPipeline);
+
     const data = await collection
       .aggregate<{
         metadata: [{ totalCount: number }];
@@ -620,7 +650,7 @@ export async function getProductFilters(query: string) {
     const brands = new Set<string>();
     for (const item of data) {
       const itemCategories = item.category.split(/[-\s,]+/);
-      brands.add(item.brand);
+      brands.add(item.brand.toLowerCase().trim());
       for (const cata of itemCategories) {
         categories.add(cata);
       }

@@ -31,7 +31,7 @@ const Menu = () => {
       <nav className="md:hidden">
         <Sheet>
           <SheetTrigger className="align-middle">
-            <SquareMenu />
+            <SquareMenu size={45} />
           </SheetTrigger>
 
           <SheetContent className="flex flex-col items-start">

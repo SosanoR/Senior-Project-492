@@ -68,7 +68,7 @@ const CartAddButton = ({
           disabled={submitting}
           variant="default"
           onClick={handleAddToCart}
-          className="w-full hover:bg-green-300"
+          className="w-full hover:bg-green-600"
         >
           {submitting ? "Adding..." : "Add to Cart"}
         </Button>

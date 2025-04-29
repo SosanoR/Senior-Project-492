@@ -126,9 +126,9 @@ const ResultsPage = async (props: {
           <li>
             <Link
               className={`${
-                (category === "all" || category === "") && "font-bold"
+                (category === "all" || category === "") && "font-bold text-green-500"
               }`}
-              href={setURL({ categoryFilter: "all" })}
+              href={setURL({ categoryFilter: "all", pg: "1" })}
             >
               All
             </Link>
@@ -136,8 +136,8 @@ const ResultsPage = async (props: {
           {filters?.categories?.map((item) => (
             <li key={item}>
               <Link
-                className={`${category === item && "font-bold"}`}
-                href={setURL({ categoryFilter: item.toLowerCase() })}
+                className={`${category === item && "font-bold text-green-500"}`}
+                href={setURL({ categoryFilter: item.toLowerCase(), pg: "1" })}
               >
                 {formatToTitleCase(item)}
               </Link>
@@ -149,8 +149,8 @@ const ResultsPage = async (props: {
         <ul className="pl-4">
           <li>
             <Link
-              className={`${(brand === "all" || brand === "") && "font-bold"}`}
-              href={setURL({ brandFilter: "all" })}
+              className={`${(brand === "all" || brand === "") && "font-bold text-green-500"}`}
+              href={setURL({ brandFilter: "all", pg: "1" })}
             >
               All
             </Link>
@@ -158,8 +158,8 @@ const ResultsPage = async (props: {
           {filters?.brands?.map((item) => (
             <li key={item}>
               <Link
-                className={`${brand === item.toLowerCase() && "font-bold"}`}
-                href={setURL({ brandFilter: item.toLowerCase() })}
+                className={`${brand === item.toLowerCase() && "font-bold text-green-500"}`}
+                href={setURL({ brandFilter: item.toLowerCase(), pg: "1" })}
               >
                 {formatToTitleCase(item)}
               </Link>
@@ -214,7 +214,7 @@ const ResultsPage = async (props: {
               <li>
                 <Link
                   className={`${
-                    (category === "all" || category === "") && "font-bold"
+                    (category === "all" || category === "") && "font-bold text-green-500"
                   }`}
                   href={setURL({ categoryFilter: "all" })}
                 >
@@ -224,8 +224,8 @@ const ResultsPage = async (props: {
               {filters?.categories?.map((item) => (
                 <li key={item}>
                   <Link
-                    className={`${category === item && "font-bold"}`}
-                    href={setURL({ categoryFilter: item.toLowerCase() })}
+                    className={`${category === item && "font-bold text-green-500"}`}
+                    href={setURL({ categoryFilter: item.toLowerCase(), pg: "1" })}
                   >
                     {formatToTitleCase(item)}
                   </Link>
@@ -238,9 +238,9 @@ const ResultsPage = async (props: {
               <li>
                 <Link
                   className={`${
-                    (brand === "all" || brand === "") && "font-bold"
+                    (brand === "all" || brand === "") && "font-bold text-green-500"
                   }`}
-                  href={setURL({ brandFilter: "all" })}
+                  href={setURL({ brandFilter: "all", pg: "1" })}
                 >
                   All
                 </Link>
@@ -248,8 +248,8 @@ const ResultsPage = async (props: {
               {filters?.brands?.map((item) => (
                 <li key={item}>
                   <Link
-                    className={`${brand === item.toLowerCase() && "font-bold"}`}
-                    href={setURL({ brandFilter: item.toLowerCase() })}
+                    className={`${brand === item.toLowerCase() && "font-bold text-green-500"}`}
+                    href={setURL({ brandFilter: item.toLowerCase(), pg: "1" })}
                   >
                     {formatToTitleCase(item)}
                   </Link>

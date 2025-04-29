@@ -8,12 +8,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface SortingOptionsProps {
   sortMethod: string;
 }
 
 const SortingOptions = ({sortMethod}: SortingOptionsProps) => {
+  const [val, setVal] = useState(sortMethod);
   const router = useRouter();
   const handleSortChange = (value: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -21,6 +23,7 @@ const SortingOptions = ({sortMethod}: SortingOptionsProps) => {
     params.set("currentPage", "1");
     router.push(`/results?${params}`);
   };
+
   return (
     <div className="flex items-center justify-between gap-3 md:justify-end">
 
@@ -29,7 +32,7 @@ const SortingOptions = ({sortMethod}: SortingOptionsProps) => {
       </div>
       <Select onValueChange={handleSortChange} defaultValue={sortMethod}>
         <SelectTrigger id="sort" className="w-[180px]">
-          <SelectValue placeholder={sortMethod} />
+          <SelectValue placeholder={sortMethod} defaultValue={sortMethod} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="default">Default</SelectItem>

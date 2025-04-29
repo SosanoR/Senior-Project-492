@@ -28,7 +28,7 @@ const SearchBar = () => {
         if (res) {
           setSuggestions(res);
         }
-      }, 100)
+      }, 300)
     );
   };
 
@@ -50,21 +50,17 @@ const SearchBar = () => {
     }
   };
 
-  const handleOutOfFocus = () => {
-    setSuggestions([]);
-  }
-
   return (
     <>
-      <form className="flex items-center justify-center space-x-2 grow" onSubmit={handleSubmit}>
-        <div className="flex justify-center">
-          <div className="relative grid">
-            <div className="flex w-full items-center">
-              <Input id="website-searchbar" type="search" placeholder="Search here" onChange={(text) => getSuggestions(text.target.value) } onBlur={handleOutOfFocus} />
+      <form className="flex  justify-center space-x-2 grow w-full " onSubmit={handleSubmit}>
+        <div className="flex w-full justify-center">
+          <div className="relative grid w-full">
+            <div className="flex w-full items-center" >
+              <Input id="website-searchbar" type="search" className="w-full flex grow" placeholder="Search here" onChange={(text) => getSuggestions(text.target.value) }  />
               {suggestions && (
-                <ul className="absolute top-[2.5rem] bg-black text-white dark:bg-white dark:text-black w-full rounded">
+                <ul className="absolute z-10 top-[2.5rem] bg-black text-white dark:bg-white dark:text-black w-full rounded">
                   {suggestions.map((item: suggestionsProps, index) => (
-                    <li key={index} onClick={() => changeInputValue(item.name)} className="hover:cursor-pointer hover:bg-gray-200 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white p-2">
+                    <li key={index} onClick={() => changeInputValue(item.name)} className="hover:cursor-pointer  hover:bg-gray-200 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white p-2">
                       {item.name}
                     </li>
                   ))}
@@ -72,7 +68,7 @@ const SearchBar = () => {
               )}
             </div>
           </div>
-          <Button className="max-w-xs">Search</Button>
+          <Button className="max-w-xs hover:bg-green-600">Search</Button>
         </div>
       </form>
     </>
