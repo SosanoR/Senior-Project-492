@@ -187,14 +187,10 @@ export async function deleteReview(data: DeleteReviewParams) {
       throw new Error("User ID does not match the session user ID.");
     }
 
-    const res = await client
+    await client
       .db("testDB")
       .collection<userReviews>("Review")
       .deleteOne({ user_id: session_id, product_id: data.product_id });
-
-    if (res.deletedCount === 0) {
-      throw new Error("No review found to delete.");
-    }
 
         // Update the product's average rating and reviewer count
         const reviews = await client
@@ -211,11 +207,10 @@ export async function deleteReview(data: DeleteReviewParams) {
           },
         ])
         .toArray();
-      if (reviews.length === 0) {
-        throw new Error("No reviews found for this product.");
-      }
-      const averageRating = reviews[0].average_rating;
-      const reviewerCount = reviews[0].reviewer_count;
+
+      const averageRating = reviews[0]?.average_rating || 0;
+      const reviewerCount = reviews[0]?.reviewer_count || 0;
+
   
       await client
         .db("testDB")

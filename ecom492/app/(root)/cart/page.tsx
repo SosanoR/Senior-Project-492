@@ -20,7 +20,7 @@ const CartPage = async () => {
         </div>
       )}
       {cart && cart.items.length > 0 && (
-        <div className="flex items-start h-full w-full">
+        <div className="flex justify-center h-full w-full">
           <div className="flex flex-col items-center">
             <h1 className="text-2xl font-bold">Your cart</h1>
             <div className="flex-col w-full p-4 items-center content-center gap-4">
