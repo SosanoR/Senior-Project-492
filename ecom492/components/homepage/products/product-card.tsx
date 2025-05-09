@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ProductPrice from "./product-price";
 import ProductImage from "./product-image";
@@ -8,7 +7,6 @@ import DisplayStars from "@/components/shared/display-stars";
 import { Button } from "@/components/ui/button";
 
 const ProductCard = ({
-  _id,
   name,
   images,
   price,
@@ -27,20 +25,16 @@ const ProductCard = ({
         </div>
       ): <div className="invisible m-2">hidden</div>}
       <CardHeader className=" p-2 items-center">
-        <Link href={`/result/${_id}`}>
           <ProductImage
             images={images}
             name={name}
             width={image_width}
             height={image_height}
           />
-        </Link>
       </CardHeader>
 
       <CardContent className=" p-4 grid gap-4">
-        <Link href={`/result/${_id}`}>
           <h2 className="text-sm font-medium">{formatToTitleCase(name)}</h2>
-        </Link>
         <div className="flex-between gap-4">
           <div className="flex gap-3 items-center">
             <Button variant="outline">{average_rating.toFixed(1)}</Button>

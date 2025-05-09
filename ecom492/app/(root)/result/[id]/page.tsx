@@ -13,14 +13,13 @@ import { getUserReview } from "@/lib/actions/review.actions";
 import CartAddButton from "@/components/result-page/product-add-cart";
 import { findCart } from "@/lib/actions/cart.actions";
 
-
 const ProductDetailsPage = async (props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ page: string }>;
 }) => {
-  const {id} = await props.params;
+  const { id } = await props.params;
   const searchParams = await props.searchParams;
-  const page = searchParams.page|| "1";
+  const page = searchParams.page || "1";
   const currentPage = Number(page) || 1;
   const product = await findProduct(id);
   const session = await auth();
@@ -43,7 +42,6 @@ const ProductDetailsPage = async (props: {
     <>
       <section>
         <div className="grid grid-cols-1 md:grid-cols-5">
-
           <div className="col-span-2">
             <ProductImages images={product.images} />
           </div>
@@ -89,7 +87,9 @@ const ProductDetailsPage = async (props: {
                 <div className="mb-2 flex justify-between">
                   <div>Price</div>
                   <ProductPrice
-                    value={Number(product.price) * ((100 - product.discount) / 100)}
+                    value={
+                      Number(product.price) * ((100 - product.discount) / 100)
+                    }
                     className={product.discount > 0 ? "text-green-600" : ""}
                   />
                 </div>

@@ -133,7 +133,6 @@ const ProductReviews = ({
                 className={page === 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
-
             {Array.from({ length: totalPages }, (_, index) => (
               <PaginationItem key={index + 1}>
                 <PaginationLink
@@ -144,7 +143,6 @@ const ProductReviews = ({
                 </PaginationLink>
               </PaginationItem>
             ))}
-
             <PaginationItem>
               <PaginationNext
                 href={

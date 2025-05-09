@@ -7,8 +7,6 @@ import {
 } from "@/lib/actions/product.actions";
 import { formatToTitleCase } from "@/lib/utils";
 import Link from "next/link";
-// import TestPage from "../test/page";
-
 import MinMaxFilter from "@/components/results-page/min-max-filters";
 import SortingOptions from "@/components/results-page/sorting-filter";
 import {
@@ -60,7 +58,25 @@ const ResultsPage = async (props: {
   const currentPage = searchParams.currentPage || "1";
   const page = Number(searchParams.currentPage) || 1;
 
-  const setURL = ({ categoryFilter, sortingFilter, brandFilter, floor, ceil, pg }: urlParams) => {
+  let res = await getAllSearchResults({
+    query: query,
+    page: page ? page : 1,
+    limit: PAGE_SIZE,
+    category: category !== "all" ? category : undefined,
+    brand: brand !== "all" ? brand : undefined,
+    min: Number(min) >= 0 ? min : undefined,
+    max: Number(max) <= 10000 ? max : undefined,
+    sort: sort !== "default" ? sort : undefined,
+  });
+  
+  const setURL = ({
+    categoryFilter,
+    sortingFilter,
+    brandFilter,
+    floor,
+    ceil,
+    pg,
+  }: urlParams) => {
     const params = {
       query,
       category,
@@ -80,17 +96,6 @@ const ResultsPage = async (props: {
 
     return `/results?${new URLSearchParams(params).toString()}`;
   };
-
-  let res = await getAllSearchResults({
-    query: query,
-    page: page ? page : 1,
-    limit: PAGE_SIZE,
-    category: category !== "all" ? category : undefined,
-    brand: brand !== "all" ? brand : undefined,
-    min: min !== "0" ? min : undefined,
-    max: max !== "10000" ? max : undefined,
-    sort: sort !== "default" ? sort : undefined,
-  });
 
   const filters = await getProductFilters(query);
 
@@ -126,7 +131,8 @@ const ResultsPage = async (props: {
           <li>
             <Link
               className={`${
-                (category === "all" || category === "") && "font-bold text-green-500"
+                (category === "all" || category === "") &&
+                "font-bold text-green-500"
               }`}
               href={setURL({ categoryFilter: "all", pg: "1" })}
             >
@@ -149,7 +155,9 @@ const ResultsPage = async (props: {
         <ul className="pl-4">
           <li>
             <Link
-              className={`${(brand === "all" || brand === "") && "font-bold text-green-500"}`}
+              className={`${
+                (brand === "all" || brand === "") && "font-bold text-green-500"
+              }`}
               href={setURL({ brandFilter: "all", pg: "1" })}
             >
               All
@@ -158,7 +166,9 @@ const ResultsPage = async (props: {
           {filters?.brands?.map((item) => (
             <li key={item}>
               <Link
-                className={`${brand === item.toLowerCase() && "font-bold text-green-500"}`}
+                className={`${
+                  brand === item.toLowerCase() && "font-bold text-green-500"
+                }`}
                 href={setURL({ brandFilter: item.toLowerCase(), pg: "1" })}
               >
                 {formatToTitleCase(item)}
@@ -168,15 +178,7 @@ const ResultsPage = async (props: {
         </ul>
 
         <div className="text-2xl m-0 p-0">Price</div>
-        <MinMaxFilter
-          query={query}
-          category={category}
-          sort={sort}
-          brand={brand}
-          min={min}
-          max={max}
-          page={currentPage}
-        />
+        <MinMaxFilter />
       </div>
 
       {/* Small Screen Sheet */}
@@ -214,7 +216,8 @@ const ResultsPage = async (props: {
               <li>
                 <Link
                   className={`${
-                    (category === "all" || category === "") && "font-bold text-green-500"
+                    (category === "all" || category === "") &&
+                    "font-bold text-green-500"
                   }`}
                   href={setURL({ categoryFilter: "all" })}
                 >
@@ -224,8 +227,13 @@ const ResultsPage = async (props: {
               {filters?.categories?.map((item) => (
                 <li key={item}>
                   <Link
-                    className={`${category === item && "font-bold text-green-500"}`}
-                    href={setURL({ categoryFilter: item.toLowerCase(), pg: "1" })}
+                    className={`${
+                      category === item && "font-bold text-green-500"
+                    }`}
+                    href={setURL({
+                      categoryFilter: item.toLowerCase(),
+                      pg: "1",
+                    })}
                   >
                     {formatToTitleCase(item)}
                   </Link>
@@ -238,7 +246,8 @@ const ResultsPage = async (props: {
               <li>
                 <Link
                   className={`${
-                    (brand === "all" || brand === "") && "font-bold text-green-500"
+                    (brand === "all" || brand === "") &&
+                    "font-bold text-green-500"
                   }`}
                   href={setURL({ brandFilter: "all", pg: "1" })}
                 >
@@ -248,7 +257,9 @@ const ResultsPage = async (props: {
               {filters?.brands?.map((item) => (
                 <li key={item}>
                   <Link
-                    className={`${brand === item.toLowerCase() && "font-bold text-green-500"}`}
+                    className={`${
+                      brand === item.toLowerCase() && "font-bold text-green-500"
+                    }`}
                     href={setURL({ brandFilter: item.toLowerCase(), pg: "1" })}
                   >
                     {formatToTitleCase(item)}
@@ -258,15 +269,7 @@ const ResultsPage = async (props: {
             </ul>
 
             <div className="text-2xl m-0 p-0">Price</div>
-            <MinMaxFilter
-              query={query}
-              category={category}
-              sort={sort}
-              brand={brand}
-              min={min}
-              max={max}
-              page={currentPage}
-            />
+            <MinMaxFilter />
           </SheetContent>
         </Sheet>
       </div>
@@ -274,7 +277,11 @@ const ResultsPage = async (props: {
 
       <div className="space-y-4 md:flex md:flex-col md:gap-4 md:col-span-3">
         <SortingOptions sortMethod={sort || "Default"} />
-        <div className="text-2xl">{`Showing results ${((page - 1) * PAGE_SIZE) + (products.data.length !== 0 ? 1 : 0)}-${(PAGE_SIZE * (page - 1)) + products.data.length } of ${products.totalFound}`}</div>
+        <div className="text-2xl">{`Showing results ${
+          (page - 1) * PAGE_SIZE + (products.data.length !== 0 ? 1 : 0)
+        }-${PAGE_SIZE * (page - 1) + products.data.length} of ${
+          products.totalFound
+        }`}</div>
 
         <div className="flex flex-col grow gap-2 ">
           {products?.data?.length === 0 && (
@@ -288,7 +295,7 @@ const ResultsPage = async (props: {
           )}
 
           {products?.data?.map((item) => (
-            <Link key={item._id.toString()} href={`/result/${item._id}`}>
+            <Link key={item._id?.toString()} href={`/result/${item._id}`}>
               <ResultCard
                 name={item.name}
                 images={item.images}

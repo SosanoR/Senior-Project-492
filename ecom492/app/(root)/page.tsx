@@ -13,7 +13,7 @@ import { ProductCardProps } from "@/_common/types";
 import ProductScrollArea from "@/components/homepage/products/product-scroll-area";
 import { Suspense } from "react";
 
-export async function BestSellingPage() {
+async function BestSellingPage() {
   const bestSellingRes = await getBestSelling(PRODUCT_DISPLAY_LIMIT);
   return (
     <div className="container mx-auto mt-5">
@@ -25,7 +25,7 @@ export async function BestSellingPage() {
   );
 }
 
-export async function LatestArrivalsPage() {
+async function LatestArrivalsPage() {
   const latestArrivalsRes = await getLatestProducts(PRODUCT_DISPLAY_LIMIT);
   return (
     <ProductBlock
@@ -35,7 +35,7 @@ export async function LatestArrivalsPage() {
   );
 }
 
-export async function ElectronicsPage() {
+async function ElectronicsPage() {
   const bestSellingElectronicsRes = await getBestSellingElectronics(
     PRODUCT_DISPLAY_LIMIT
   );
@@ -47,7 +47,7 @@ export async function ElectronicsPage() {
   );
 }
 
-export async function TopDiscountsPage() {
+async function TopDiscountsPage() {
   const topDiscountsRes = await getTopDiscounts(PRODUCT_DISPLAY_LIMIT);
 
   return (

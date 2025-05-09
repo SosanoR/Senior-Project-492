@@ -255,18 +255,14 @@ export async function findCart() {
     const session = await auth();
     const user_id = session?.user?.id ? session.user.id.toString() : undefined;
     const cart_id = (await cookies()).get("cart_id")?.value;
-    let cart: cart | null;
-
-    if (!cart_id) {
-      throw new Error("Cart ID not found in cookies.");
-    }
+    let cart;
 
     if (user_id) {
       cart = await client
         .db("testDB")
         .collection<cart>("Cart")
         .findOne<cart>({ user_id: user_id, status: "active" });
-    } else {
+    } else if (cart_id) {
       cart = await client
         .db("testDB")
         .collection<cart>("Cart")

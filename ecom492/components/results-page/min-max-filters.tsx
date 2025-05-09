@@ -4,18 +4,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-interface SearchParamsProps {
-  query: string;
-  category?: string;
-  sort?: string;
-  brand?: string;
-  min?: string;
-  max?: string;
-  page?: string;
-}
-
-
-const MinMaxFilter = ({query, category, sort, brand, min, max, page}: SearchParamsProps) => {
+const MinMaxFilter = () => {
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
   const router = useRouter();
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {

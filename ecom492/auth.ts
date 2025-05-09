@@ -4,7 +4,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import * as argon2 from "argon2";
 import client from "./lib/db";
 import { user_data } from "./_common/types";
-import { ObjectId } from "mongodb";
 import { authConfig } from "./auth.config";
 import { cookies } from "next/headers";
 import { cart } from "./_common/types";
@@ -15,7 +14,7 @@ const config = {
   },
   session: {
     strategy: "jwt" as const,
-    maxAge: 24 * 60 * 60,
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   adapter: MongoDBAdapter(client),
   providers: [
@@ -24,10 +23,12 @@ const config = {
         email: { type: "email" },
         password: { type: "password" },
       },
+      
       async authorize(credentials) {
         if (credentials == null) {
           return null;
         }
+        
         const user = await client
           .db("testDB")
           .collection("User")
@@ -68,20 +69,9 @@ const config = {
       }
       return session;
     },
-    async jwt({ token, user, trigger, session }: any) {
-
+    async jwt({ token, user, trigger }: any) {
       if (user) {
         token.role = user.role;
-        if (user.name === "") {
-          token.name = user.email.split("@")[0];
-          const filter = { _id: new ObjectId(token.sub) };
-          const updateName = { $set: { name: token.name } };
-          await client
-            .db("testDB")
-            .collection("User")
-            .updateOne(filter, updateName);
-        }
-
         if (trigger === "signIn") {
           const cookie = await cookies();
           const cart_id = cookie.get("cart_id")?.value;
@@ -90,12 +80,10 @@ const config = {
               .db("testDB")
               .collection<cart>("Cart")
               .findOne({ cart_id: cart_id });
-
             const prevCart = await client
               .db("testDB")
               .collection<cart>("Cart")
               .findOne({ user_id: user.id, status: "active" });
-
             if (prevCart) {
               if (cart) {
                 for (const item of cart.items) {
@@ -149,7 +137,7 @@ const config = {
     ...authConfig.callbacks,
   },
   events: {
-    async signOut({ token }) {
+    async signOut() {
       const cookie = await cookies();
       cookie.set("cart_id", crypto.randomUUID());
     },

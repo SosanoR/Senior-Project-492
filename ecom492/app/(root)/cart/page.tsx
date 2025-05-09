@@ -2,9 +2,7 @@ import EmptyCart from "@/components/cart/cart-empty-btn";
 import CartQuantity from "@/components/cart/cart-quantity";
 import ResultCard from "@/components/results-page/result-card";
 import { Button } from "@/components/ui/button";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { findCart } from "@/lib/actions/cart.actions";
 import Link from "next/link";
 
@@ -13,12 +11,14 @@ const CartPage = async () => {
 
   return (
     <div>
+      
       {(!cart || cart.items.length === 0) && (
         <div className="flex flex-col items-center h-full w-full">
           <h1 className="text-2xl font-bold">Your cart is empty</h1>
           <p className="text-lg">Start shopping now!</p>
         </div>
       )}
+
       {cart && cart.items.length > 0 && (
         <div className="flex justify-center h-full w-full">
           <div className="flex flex-col items-center">

@@ -12,7 +12,6 @@ import { PAGE_SIZE } from "../constants";
 
 export async function getReviews(product_id: string, page: number = 1) {
   try {
-
     const pipeline = [
       {
         $match: { product_id },
@@ -24,12 +23,6 @@ export async function getReviews(product_id: string, page: number = 1) {
         },
       },
     ];
-
-    // const reviews = await client
-    //   .db("testDB")
-    //   .collection<userReviews>("Review")
-    //   .find<userReviews>({ product_id })
-    //   .toArray();
 
     const reviews = await client
       .db("testDB")
@@ -192,7 +185,6 @@ export async function deleteReview(data: DeleteReviewParams) {
       .collection<userReviews>("Review")
       .deleteOne({ user_id: session_id, product_id: data.product_id });
 
-        // Update the product's average rating and reviewer count
         const reviews = await client
         .db("testDB")
         .collection("Review")

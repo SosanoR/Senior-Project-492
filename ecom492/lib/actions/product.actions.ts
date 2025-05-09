@@ -19,6 +19,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { insertProductSchema, updateProductSchema } from "../validators";
 import cloudinary from "cloudinary";
+import { filteringParamsSchema } from "../validators";
 
 cloudinary.v2.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -116,7 +117,6 @@ export async function getTopDiscounts(limit: number) {
       },
       {
         $sort: { discount: -1, average_rating: -1 },
-
       },
       {
         $limit: limit,
@@ -124,9 +124,9 @@ export async function getTopDiscounts(limit: number) {
     ];
 
     const data = await collection
-    .aggregate<ProductCardProps>(pipeline)
-    .toArray();
-    
+      .aggregate<ProductCardProps>(pipeline)
+      .toArray();
+
     return data;
   } catch (error) {
     console.log(error);
@@ -248,7 +248,6 @@ export async function createProduct(
     const collection = client.db("testDB").collection<insertionData>("items");
 
     const sells = Number((Math.random() * 1000).toFixed(0));
-
 
     await collection.insertOne({
       ...product,
@@ -474,9 +473,16 @@ export async function getAllSearchResults({
   sort,
 }: productFilterQuery) {
   try {
-    const filteredPipeline = [];
+    const pageFilters = { query, limit, page, brand, category, min, max, sort };
+    const filters = filteringParamsSchema.safeParse(pageFilters);
 
-    const queryPipeline = {
+    if (!filters.success) {
+      throw new Error(filters.error.errors[0].message);
+    }
+
+    const filteringPipeline = [];
+
+    const queryFilters = {
       $search: {
         index: "itemsDB",
         compound: {
@@ -507,54 +513,40 @@ export async function getAllSearchResults({
       },
     };
 
-    filteredPipeline.push(queryPipeline);
+    filteringPipeline.push(queryFilters);
+
+    const matchStage: {
+      brand?: { $regex: string; $options: string };
+      category?: { $regex: string; $options: string };
+      price?: { $gte?: number; $lte?: number };
+    } = {};
 
     if (brand) {
-      filteredPipeline.push({
-        $match: {
-          brand: { $regex: brand, $options: "i" },
-        },
-      });
+      matchStage.brand = { $regex: brand, $options: "i" };
     }
-
     if (category) {
-      filteredPipeline.push({
-        $match: {
-          category: { $regex: category, $options: "i" },
-        },
-      });
+      matchStage.category = { $regex: category, $options: "i" };
     }
-
     if (min) {
-      filteredPipeline.push({
-        $match: {
-          price: { $gte: Number(min) },
-        },
-      });
+      matchStage.price = { ...matchStage.price, $gte: Number(min) };
     }
-
     if (max && (!min || Number(min) <= Number(max))) {
-      filteredPipeline.push({
-        $match: {
-          price: { $lte: Number(max) },
-        },
-      });
+      matchStage.price = { ...matchStage.price, $lte: Number(max) };
     }
 
-    if (
-      sort === "price-l-h" ||
-      sort === "price-h-l" ||
-      sort === "rating-l-h" ||
-      sort === "rating-h-l"
-    ) {
+    if (Object.keys(matchStage).length > 0) {
+      filteringPipeline.push({ $match: matchStage });
+    }
+
+    if (sort) {
       if (sort === "price-l-h") {
-        filteredPipeline.push({ $sort: { price: 1, _id: 1 } });
+        filteringPipeline.push({ $sort: { price: 1, _id: 1 } });
       } else if (sort === "price-h-l") {
-        filteredPipeline.push({ $sort: { price: -1, _id: 1 } });
+        filteringPipeline.push({ $sort: { price: -1, _id: 1 } });
       } else if (sort === "rating-l-h") {
-        filteredPipeline.push({ $sort: { average_rating: 1, _id: 1 } });
+        filteringPipeline.push({ $sort: { average_rating: 1, _id: 1 } });
       } else if (sort === "rating-h-l") {
-        filteredPipeline.push({ $sort: { average_rating: -1, _id: 1 } });
+        filteringPipeline.push({ $sort: { average_rating: -1, _id: 1 } });
       }
     }
 
@@ -579,7 +571,7 @@ export async function getAllSearchResults({
       },
     ];
 
-    filteredPipeline.push(...manditoryFilters);
+    filteringPipeline.push(...manditoryFilters);
 
     const collection = client.db("testDB").collection<data>("items");
 
@@ -587,7 +579,7 @@ export async function getAllSearchResults({
       .aggregate<{
         metadata: [{ totalCount: number }];
         data: ProductResultsCardProps[];
-      }>(filteredPipeline)
+      }>(filteringPipeline)
       .toArray();
 
     if (data[0].data.length > 0) {
@@ -608,7 +600,7 @@ export async function getProductFilters(query: string) {
   try {
     const filterPipeline = [];
 
-    const queryPipeline = {
+    const queryFilters = {
       $search: {
         index: "itemsDB",
         compound: {
@@ -639,7 +631,7 @@ export async function getProductFilters(query: string) {
       },
     };
 
-    filterPipeline.push(queryPipeline);
+    filterPipeline.push(queryFilters);
     const collection = client.db("testDB").collection<data>("items");
 
     const data = await collection

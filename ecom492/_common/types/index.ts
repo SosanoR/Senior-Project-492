@@ -36,7 +36,7 @@ export type insertionData = {
 };
 
 export interface ProductCardProps {
-  _id: string | ObjectId;
+  _id?: string | ObjectId;
   name: string;
   images: string[];
   average_rating: number;

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ProductCard from "./product-card";
 import { ProductCardProps } from "@/_common/types";
 
@@ -15,16 +16,16 @@ const ProductList = ({ products, title }: ProductListProps) => {
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 justify-items-center">
           {products.map((product: ProductCardProps, key: React.Key) => (
-            <ProductCard
-              key={key}
-              _id={product._id}
-              images={product.images}
-              name={product.name}
-              price={product.price}
-              discount={product.discount}
-              quantity={product.quantity}
-              average_rating={product.average_rating}
-            />
+            <Link key={key} href={`/result/${product._id}`}>
+              <ProductCard
+                images={product.images}
+                name={product.name}
+                price={product.price}
+                discount={product.discount}
+                quantity={product.quantity}
+                average_rating={product.average_rating}
+              />
+            </Link>
           ))}
         </div>
       ) : (

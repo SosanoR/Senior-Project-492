@@ -8,14 +8,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 interface SortingOptionsProps {
   sortMethod: string;
 }
 
 const SortingOptions = ({sortMethod}: SortingOptionsProps) => {
-  const [val, setVal] = useState(sortMethod);
+
   const router = useRouter();
   const handleSortChange = (value: string) => {
     const params = new URLSearchParams(window.location.search);
